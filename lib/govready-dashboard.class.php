@@ -3,97 +3,37 @@
  * @author GovReady
  */
 
-namespace Govready\GovreadyDashboard;
+//namespace Govready\GovreadyDashboard;
 
-use Govready;
+//use Govready;
 
-class GovreadyDashboard extends Govready\Govready {
+class GovreadyDashboard {
 
 
   function __construct() {
-    parent::__construct();
+
+    $this->path = drupal_get_path('module', 'govready');
+    //parent::__construct();
 
     // Display the admin notification
-    add_action( 'admin_notices', array( $this, 'plugin_activation' ) ) ;
+    //add_action( 'admin_notices', array( $this, 'plugin_activation' ) ) ;
 
     // Add the dashboard page
-    add_action( 'admin_menu', array($this, 'create_menu') );
+    //add_action( 'admin_menu', array($this, 'create_menu') );
   }
-
-
-  /**
-   * Saves the version of the plugin to the database and displays an activation notice on where users
-   * can connect to the GovReady API.
-   */
-  public function plugin_activation() {
-    $options = get_option( 'govready_options', array() );
-    
-    // Check that GovReady has been enabled
-    if( empty($options['refresh_token']) ) {
-
-      $html = '<div class="updated">';
-        $html .= '<p>';
-          $html .= __( '<a href="admin.php?page=govready">Connect to GovReady</a> to finish your setup and begin monitoring your site.', $this->key );
-        $html .= '</p>';
-      $html .= '</div><!-- /.updated -->';
-
-      echo $html;
-
-    } // end if
-
-    // check that cURL exists
-    if( !function_exists('curl_version') ) {
-
-      $html = '<div class="update-nag">';
-        $html .= __( 'It looks like cURL is currently not enabled.  The GovReady plugin will not work without cURL enabled. <a href="http://www.tomjepson.co.uk/enabling-curl-in-php-php-ini-wamp-xamp-ubuntu/" target="_blank">Tutorial to enable cURL in PHP</a>.', $this->key );
-      $html .= '</div><!-- /.update-nag -->';
-
-      echo $html;
-
-    } // end if
-
-  } // end plugin_activation
-
-
-
-  /**
-   * Deletes the option from the database.
-   */
-  public static function plugin_deactivation() {
-
-    delete_option( 'govready_options' );
-    delete_option( 'govready_token' );
-
-  } // end plugin_deactivation
-
-
-  /**
-   * Creates the wp-admin menu entries for the dashboard.
-   */
-  public function create_menu() {
-
-    add_menu_page(
-      __( 'GovReady', $this->key ), 
-      __( 'GovReady', $this->key ), 
-      'manage_options',
-      'govready',
-      array($this, 'dashboard_page'), 
-      plugins_url('/../images/icon.png', __FILE__) 
-    );
-
-  } // end create_menu
 
 
   /**
    * Display the GovReady dashboard.
    */
   public function dashboard_page() {
-    $options = get_option( 'govready_options', array() );
-    $path = plugins_url('../includes/js/',__FILE__);
-    $logo = plugins_url('/../images/logo.png', __FILE__);
+    $options = variable_get( 'govready_options', array() );
 
-    // Enqueue Bootstrap 
-    wp_enqueue_style( 'govready-bootstrap-style', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' );
+    $path = $this->path . '/includes/js/';
+    $logo = $this->path . '/images/logo.png';
+
+    // Enqueue Bootstrap
+    drupal_add_js('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', 'external');
     wp_enqueue_script( 'govready-bootstrap-script', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js', array(), true );
 
     // First time using app, need to set everything up
@@ -101,9 +41,10 @@ class GovreadyDashboard extends Govready\Govready {
 
       // Call GovReady /initialize to set the allowed CORS endpoint
       // @todo: error handling: redirect user to GovReady API dedicated login page
+      global $base_url;
       if (empty($options['siteId'])) {
         $data = array(
-          'url' => get_site_url(),
+          'url' => $base_url,
         );
         $response = $this->api( '/initialize', 'POST', $data, true );
         $options['siteId'] = $response['_id'];
@@ -144,4 +85,3 @@ class GovreadyDashboard extends Govready\Govready {
   }
 
 }
-new GovreadyDashboard;
