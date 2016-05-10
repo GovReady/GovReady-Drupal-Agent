@@ -10,6 +10,7 @@
  */
 function govready_config() {
   return array(
+    'api_debug' => false,
     'auth0' => array(
       'domain' => 'govready.auth0.com',
       'client_id' => 'HbYZO5QXKfgNshjKlhZGizskiaJH9kGH'
@@ -48,14 +49,14 @@ function govready_menu() {
   );
 
   $items['govready/api'] = array(
-    'page callback' => 'govready_api_callback',
+    'page callback' => 'govready_api_proxy',
     'page arguments' => array(),
     'access arguments' => array('view govready'), // @todo: what if user only has administer govready permission?
     'type' => MENU_CALLBACK,
   );
 
   $items['govready/refresh-token'] = array(
-    'page callback' => 'govready_refresh_token_callback',
+    'page callback' => 'govready_refresh_token',
     'page arguments' => array(),
     'access arguments' => array('view govready'), // @todo: what if user only has administer govready permission?
     'type' => MENU_CALLBACK,
@@ -69,18 +70,14 @@ function govready_menu() {
  * Page callback for the GovReady Dashboard.
  */
 function govready_dashboard_callback() {
+  module_load_include('class.php', 'govready', 'lib/govready-dashboard');
+  $dashboard = new GovreadyDashboard;
+
+
+print_r($dashboard);
   return 'asdf';
+
 }
-
-
-
-/**
- * Callback for the GovReady refresh token API endpoint.
- */
-function govready_refresh_token_callback() {
-  return 'asdf';
-}
-
 
 
 /**
@@ -116,7 +113,7 @@ function govready_api( $endpoint, $method = 'GET', $data = array(), $anonymous =
   curl_close($curl);
   
   // Only for debugging
-  if ( !empty($this->api_debug) && $this->api_debug ) {
+  if ( !empty($config['api_debug']) && $config['api_debug'] ) {
     print_r($url);
     print_r($data);
     print_r($response);
@@ -131,7 +128,7 @@ function govready_api( $endpoint, $method = 'GET', $data = array(), $anonymous =
 /**
  * Refresh the access token.
  */
-public function govready_refresh_token( $return = false ) {
+function govready_refresh_token( $return = false ) {
   
   // @todo: nonce this call
   $options = variable_get( 'govready_options' );
@@ -142,13 +139,13 @@ public function govready_refresh_token( $return = false ) {
     //}
     $token = $_REQUEST['refresh_token'];
     $options['refresh_token'] = $token;
-    update_option( 'govready_options', $options );
+    variable_set( 'govready_options', $options );
   }
   else {
     $token = !empty($options['refresh_token']) ? $options['refresh_token'] : '';
   }
 
-  $response = $this->api( '/refresh-token', 'POST', array( 'refresh_token' => $token), true );
+  $response = govready_api( '/refresh-token', 'POST', array( 'refresh_token' => $token), true );
   $response['endoflife'] = time() + (int) $response['expires_in'];
   update_option( 'govready_token', $response );
 
@@ -156,8 +153,20 @@ public function govready_refresh_token( $return = false ) {
     return $response;
   }
   else {
-    wp_send_json($response);
+    drupal_json_output($response);
   }
+
+}
+
+
+/**
+ * Call the GovReady API.
+ */
+function govready_api_proxy() {
+
+  $method = !empty($_REQUEST['method']) ? $_REQUEST['method'] : $_SERVER['REQUEST_METHOD'];
+  $response = govready_api( $_REQUEST['endpoint'], $method, $_REQUEST );
+  drupal_json_output($response);
 
 }
 
