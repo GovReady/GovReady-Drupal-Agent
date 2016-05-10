@@ -13,6 +13,7 @@ class GovreadyDashboard {
   function __construct() {
 
     $this->path = drupal_get_path('module', 'govready');
+    $this->config = govready_config();
     //parent::__construct();
 
     // Display the admin notification
@@ -21,7 +22,6 @@ class GovreadyDashboard {
     // Add the dashboard page
     //add_action( 'admin_menu', array($this, 'create_menu') );
   }
-
 
   /**
    * Display the GovReady dashboard.
@@ -34,7 +34,7 @@ class GovreadyDashboard {
 
     // Enqueue Bootstrap
     drupal_add_js('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', 'external');
-    wp_enqueue_script( 'govready-bootstrap-script', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js', array(), true );
+    drupal_add_css( array('external' => 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js') );
 
     // First time using app, need to set everything up
     if( empty($options['refresh_token']) ) {
@@ -46,20 +46,23 @@ class GovreadyDashboard {
         $data = array(
           'url' => $base_url,
         );
-        $response = $this->api( '/initialize', 'POST', $data, true );
+        $response = govready_api( '/initialize', 'POST', $data, true );
         $options['siteId'] = $response['_id'];
-        update_option( 'govready_options', $options );
+        variable_set( 'govready_options', $options );
       }
 
       // Save some JS variables (available at govready.siteId, etc)
-      wp_enqueue_script( 'govready-connect', $path . 'govready-connect.js' );
-      wp_localize_script( 'govready-connect', 'govready_connect', array( 
-        'nonce' => wp_create_nonce( $this->key ),
-        'auth0' => $this->auth0,
+      drupal_add_js( $path . 'govready-connect.js' );
+      drupal_add_js(array('govready_connect' => array(
+        //'nonce' => wp_create_nonce( $this->key ),
+        'auth0' => $this->config['auth0'],
         'siteId' => $options['siteId']
-      ) );
+      )), 'setting');
 
-      require_once plugin_dir_path(__FILE__) . '../templates/govready-connect.php';
+      return theme('govready_connect', array(
+        'logo' => url($logo),
+        'path' => url($path),
+      ));  // @todo: variables?
     
     }
 

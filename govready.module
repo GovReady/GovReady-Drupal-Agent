@@ -72,11 +72,7 @@ function govready_menu() {
 function govready_dashboard_callback() {
   module_load_include('class.php', 'govready', 'lib/govready-dashboard');
   $dashboard = new GovreadyDashboard;
-
-
-print_r($dashboard);
-  return 'asdf';
-
+  return $dashboard->dashboard_page();
 }
 
 
@@ -207,22 +203,23 @@ function govready_api_proxy() {
 /**
  * Implements hook_theme().
  */
-/*function govready_theme() {
+function govready_theme() {
   //$path = drupal_get_path('module', 'govready');
   global $base_url;
   return array(
-    'govready_app' => array(
-      'template' => 'templates/app',
+    'govready_connect' => array(
+      'template' => 'templates/govready-connect',
       'variables' => array(
-        'app_path' => url(govready_app_path()),
-        'payment_url' => 'http://workhorse.albatrossdigital.com/payment-callback.php',
-        'track_url' => 'http://markaspot.helmcivic.com/georeport/v2',
-        'api_path' => $base_url . '/',
-        'vocabulary_vid' => 3,
+        'logo' => '',
+        'path' => '',
       )
     ),
+    'govready_dashboard' => array(
+      'template' => 'templates/govready-dashboard',
+      'variables' => array()
+    ),
   );
-}*/
+}
 
 
 /**
