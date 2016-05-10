@@ -33,8 +33,8 @@ class GovreadyDashboard {
     $logo = $this->path . '/images/logo.png';
 
     // Enqueue Bootstrap
-    drupal_add_js('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', 'external');
-    drupal_add_css( array('external' => 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js') );
+    drupal_add_css('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', 'external');
+    drupal_add_js( array('external' => 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js') );
 
     // First time using app, need to set everything up
     if( empty($options['refresh_token']) ) {
