@@ -16,8 +16,8 @@ function govready_config() {
       'client_id' => 'HbYZO5QXKfgNshjKlhZGizskiaJH9kGH'
     ),
     'commercial' => false,
-    //'govready_url' => 'http://plugin.govready.com/v1.0',
-    'govready_url' => 'http://localhost:4000/v1.0', // NOTE: Docker can't see this!
+    'govready_url' => 'http://plugin.govready.com/v1.0',
+    //'govready_url' => 'http://localhost:4000/v1.0', // NOTE: Docker can't see this!
   );
 }
 
@@ -63,7 +63,7 @@ function govready_menu() {
   );
 
   $items['govready/trigger'] = array(
-    'page callback' => 'govready_trigger',
+    'page callback' => 'govready_trigger_callback',
     'page arguments' => array(),
     'access callback' => TRUE,
     //'access arguments' => array('view govready'), // @todo: what if user only has administer govready permission?
@@ -78,9 +78,23 @@ function govready_menu() {
  * Page callback for the GovReady Dashboard.
  */
 function govready_dashboard_callback() {
+
   module_load_include('class.php', 'govready', 'lib/govready-dashboard');
   $dashboard = new GovreadyDashboard;
   return $dashboard->dashboard_page();
+
+}
+
+
+/**
+ * Call the GovReady Agent trigger.
+ */
+function govready_trigger_callback() {
+
+  module_load_include('class.php', 'govready', 'lib/govready-agent');
+  $agent = new GovreadyAgent;
+  return $agent->ping();
+
 }
 
 
@@ -171,16 +185,6 @@ function govready_api_proxy() {
   $method = !empty($_REQUEST['method']) ? $_REQUEST['method'] : $_SERVER['REQUEST_METHOD'];
   $response = govready_api( $_REQUEST['endpoint'], $method, $_REQUEST );
   drupal_json_output($response);
-
-}
-
-
-/**
- * Call the GovReady Agent trigger.
- */
-function govready_trigger() {
-
-  return 'ASDF';
 
 }
 

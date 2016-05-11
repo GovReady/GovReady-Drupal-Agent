@@ -24,17 +24,18 @@ class GovreadyAgent { //extends Govready\Govready {
   public function ping() {
     print_r($_POST);
 
-    $options = get_option( 'govready_options' );
+    $options = variable_get( 'govready_options' );
     // @todo: check that request is coming from plugin.govready.com, or is properly nonced (for manual refreshes)
     if ($_POST['siteId'] == $options['siteId']) {
 
       $key = $_POST['key'];
       if ( !empty($key) ) { 
         $data = call_user_func( array($this, $key) );
+        print_r($data);
         if (!empty($data)) {
           //print_r($data);return;
           $endpoint = '/sites/' . $options['siteId'] . '/' . $_POST['endpoint'];
-          $return = parent::api( $endpoint, 'POST', $data );
+          $return = govready_api( $endpoint, 'POST', $data );
           print_r($data);
           print_r($return); // @todo: comment this out, also don't return data in API
         }
@@ -49,17 +50,18 @@ class GovreadyAgent { //extends Govready\Govready {
 
   // Callback for ?action=govready_v1_trigger&key=plugins
   private function plugins() {
-
     $out = array();
-    $plugins = get_plugins();
-    foreach ($plugins as $key => $plugin) {
-      $plugins[$key]['Active'] = is_plugin_active($key);
-      $namespace = explode('/', $key);
+
+    // Hint to use system_rebuild_module_data() came from 
+    // http://stackoverflow.com/questions/4232113/drupal-how-to-get-the-modules-list
+    $modules = system_rebuild_module_data();
+    
+    foreach ($modules as $key => $module) {
       array_push( $out, array(
-        'label' => $plugin['Name'],
-        'namespace' => $namespace[0],
-        'status' => is_plugin_active($key),  // @todo: this is always returning FALSE
-        'version' => $plugin['Version'],
+        'label' => $module->info['name'],
+        'namespace' => $key,
+        'status' => $module->status,
+        'version' => $module->info['version'],
       ) );
     }
 
@@ -71,22 +73,22 @@ class GovreadyAgent { //extends Govready\Govready {
   // Callback for ?action=govready_v1_trigger&key=accounts
   private function accounts() {
     $out = array();
-    $fields = array( 'ID', 'user_login', 'user_email', 'user_nicename', 'user_registered', 'user_status' );
-    $users = get_users( array( 
-      'fields' => $fields,
-      'role__not_in' => 'subscriber',
-    ) );
+    
+    $users = entity_load('user');
 
     foreach ($users as $key => $user) {
-      array_push( $out, array(
-        'userId' => $user->ID,
-        'username' => $user->user_login,
-        'email' => $user->user_email,
-        'name' => $user->user_nicename,
-        'created' => $user->user_registered,
-        'roles' => get_user_meta( $user->ID, 'wp_capabilities', true ),
-        'lastLogin' => get_user_meta( $user->ID, 'govready_last_login', true ),
-      ) );
+      if ($key > 0) {
+        array_push( $out, array(
+          'userId' => $user->uid,
+          'username' => $user->name,
+          'email' => $user->mail,
+          'name' => $user->name,
+          'created' => $user->created,
+          'roles' => $user->roles,
+          'lastLogin' => $user->login,
+        ) );
+      }
+      
     }
     
     return array( 'accounts' => $out, 'forceDelete' => true );
@@ -97,14 +99,13 @@ class GovreadyAgent { //extends Govready\Govready {
   // Callback for ?action=govready_v1_trigger&key=stack
   private function stack() {
 
-    global $wp_version;
     $stack = array(
       'os' => php_uname( 's' ) .' '. php_uname( 'r' ),
       'language' => 'PHP ' . phpversion(),
       'server' => $_SERVER["SERVER_SOFTWARE"],
       'application' => array(
-        'platform' => 'WordPress',
-        'version' => $wp_version,
+        'platform' => 'Drupal',
+        'version' => VERSION, // @todo
       ),
       'database' => null,
     );
@@ -114,18 +115,4 @@ class GovreadyAgent { //extends Govready\Govready {
   }
 
 
-
-
-  /**
-   * Helper functions
-   **/
-
-  // Save the user's last login
-  // From: https://wordpress.org/support/topic/capture-users-last-login-datetime
-  function last_login_save($user_login, $user) {
-    $user = get_userdatabylogin($user_login);
-    update_user_meta( $user->ID, 'govready_last_login', date('c') );
-  }
-
-
-}
+} // class
