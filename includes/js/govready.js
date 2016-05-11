@@ -1,5 +1,11 @@
 
-(function($) {
+(function($, Drupal) {
+  Drupal.behaviors.angular_311 = {
+    attach: function(context, settings) {
+
+  var govready = settings.govready;
+  var ajaxurl = govready.api_endpoint;
+  
   // Example API query
   jQuery.get(
     ajaxurl, 
@@ -70,4 +76,10 @@
       console.log('/vulnerabilities', response);
     }
   );
-})(jQuery);
+
+
+
+
+    } // attach
+  };
+})(jQuery, Drupal);

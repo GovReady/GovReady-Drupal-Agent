@@ -3,22 +3,15 @@
  * @author GovReady
  */
 
-namespace Govready\GovreadyAgent;
+//namespace Govready\GovreadyAgent;
 
-use Govready;
+//use Govready;
 
-class GovreadyAgent extends Govready\Govready {
+class GovreadyAgent { //extends Govready\Govready {
 
 
   function __construct() {
-    parent::__construct();
-
-    // Define the ping trigger endpoint
-    add_action( 'wp_ajax_nopriv_govready_v1_trigger', array($this, 'ping') );
-
-    // Save the user's last login timestamp
-    add_action( 'wp_login', array($this, 'last_login_save'), 10, 2 );
-
+    //parent::__construct();
   }
 
   /**
@@ -136,4 +129,3 @@ class GovreadyAgent extends Govready\Govready {
 
 
 }
-new GovreadyAgent;

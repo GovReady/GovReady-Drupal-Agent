@@ -1,9 +1,13 @@
 /**
  * Add the Auth0 Lock plugin if the user has not set up their credentials.
  */
-(function($) {
-  var domain = govready_connect.auth0.domain;
-  var clientID = govready_connect.auth0.client_id;
+
+(function($, Drupal) {
+  Drupal.behaviors.angular_311 = {
+    attach: function(context, settings) {
+
+  var domain = settings.govready_connect.auth0.domain;
+  var clientID = settings.govready_connect.auth0.client_id;
   var lock = new Auth0Lock(clientID, domain);
 
 
@@ -16,15 +20,15 @@
     authParams: {
       scope: 'openid offline_access'
     },
-    device: 'govready-wordpress-' + govready_connect.siteId
+    device: 'govready-wordpress-' + settings.govready_connect.siteId
   }, function (err, profile, id_token, access_token, state, refresh_token) {
     // Save the refresh token in WordPress
+    console.log(settings.govready_connect.token_endpoint);
     jQuery.post(
-      ajaxurl + '?action=govready_refresh_token', 
+      settings.govready_connect.token_endpoint, 
       {
-        //'action': 'govready_refresh_token',
         'refresh_token': refresh_token,
-        '_ajax_nonce': govready_connect.nonce
+        //@todo: '_ajax_nonce': settings.govready_connect.nonce
       }, 
       function(response){
         console.log(response);
@@ -60,7 +64,7 @@
     }
     else {
       jQuery.post(
-        ajaxurl + '?action=govready_proxy&endpoint=/monitor/' + govready_connect.siteId + '/' + remoteSteps[completed], 
+        settings.govready_connect.api_endpoint + '?endpoint=/monitor/' + settings.govready_connect.siteId + '/' + remoteSteps[completed], 
         {}, 
         function(response){
           // We're in local mode
@@ -95,12 +99,12 @@
     }
     else {
       var data = localSteps[completed];
-      data.siteId = govready_connect.siteId;
-      data._ajax_nonce = govready_connect.nonce;
+      data.siteId = settings.govready_connect.siteId;
+      // @todo: data._ajax_nonce = govready_connect.nonce;
 
       $.ajax({
         "async": true,
-        "url": ajaxurl + '?action=govready_v1_trigger',
+        "url": settings.govready_connect.trigger_endpoint,
         "method": "POST",
         //contentType: "application/x-form-urlencoded",
         "data": data,
@@ -120,4 +124,9 @@
     initLocal(0);
   });
 
-})(jQuery);
+
+
+    } // attach
+  };
+})(jQuery, Drupal);
+

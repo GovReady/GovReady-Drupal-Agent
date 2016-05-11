@@ -30,11 +30,15 @@ class GovreadyDashboard {
     $options = variable_get( 'govready_options', array() );
 
     $path = $this->path . '/includes/js/';
-    $logo = $this->path . '/images/logo.png';
+    $settings = array(
+      'api_endpoint' => url('govready/api'),
+      'token_endpoint' => url('govready/refresh-token'),
+      'trigger_endpoint' => url('govready/trigger'),
+    );
 
     // Enqueue Bootstrap
-    drupal_add_css('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', 'external');
-    drupal_add_js( array('external' => 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js') );
+    //drupal_add_css('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', 'external');
+    drupal_add_js('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js', 'external');
 
     // First time using app, need to set everything up
     if( empty($options['refresh_token']) ) {
@@ -53,16 +57,14 @@ class GovreadyDashboard {
 
       // Save some JS variables (available at govready.siteId, etc)
       drupal_add_js( $path . 'govready-connect.js' );
-      drupal_add_js(array('govready_connect' => array(
+      $settings = array_merge(array(
         //'nonce' => wp_create_nonce( $this->key ),
         'auth0' => $this->config['auth0'],
         'siteId' => $options['siteId']
-      )), 'setting');
+      ), $settings);
+      drupal_add_js(array('govready_connect' => $settings), 'setting');
 
-      return theme('govready_connect', array(
-        'logo' => url($logo),
-        'path' => url($path),
-      ));  // @todo: variables?
+      return theme('govready_connect');
     
     }
 
@@ -70,18 +72,19 @@ class GovreadyDashboard {
     else {
     
       // Save some JS variables (available at govready.siteId, etc)
-      wp_enqueue_script( 'govready-dashboard', $path . 'govready.js' );
-      wp_localize_script( 'govready-dashboard', 'govready', array( 
+      drupal_add_js( $path . 'govready.js' );
+      $settings = array_merge(array(
         'siteId' => !is_null($options['siteId']) ? $options['siteId'] : null, 
-        'nonce' => wp_create_nonce( $this->key )
-      ) );
+        //@todo: 'nonce' => wp_create_nonce( $this->key )
+      ), $settings);
+      drupal_add_js(array('govready' => $settings), 'setting');
 
       // Enqueue react
-      wp_enqueue_script( 'govready-dashboard-app-vendor', $path . 'client/dist/vendor.dist.js' );
-      wp_enqueue_script( 'govready-dashboard-app', $path . 'client/dist/app.dist.js', array('govready-dashboard-app-vendor') );
-      wp_enqueue_style ( 'govready-dashboard-app', $path . 'client/dist/app.dist.css' );
+      drupal_add_js( $path . 'client/dist/vendor.dist.js' );
+      drupal_add_js( $path . 'client/dist/app.dist.js' ); // @todo? , array('govready-dashboard-app-vendor')
+      drupal_add_css ( $path . 'client/dist/app.dist.css' );
 
-      require_once plugin_dir_path(__FILE__) . '../templates/govready-dashboard.php';
+      return theme('govready_connect');
 
     } // if()
 

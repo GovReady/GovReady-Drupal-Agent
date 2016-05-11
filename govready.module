@@ -62,6 +62,14 @@ function govready_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['govready/trigger'] = array(
+    'page callback' => 'govready_trigger',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    //'access arguments' => array('view govready'), // @todo: what if user only has administer govready permission?
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
@@ -143,7 +151,7 @@ function govready_refresh_token( $return = false ) {
 
   $response = govready_api( '/refresh-token', 'POST', array( 'refresh_token' => $token), true );
   $response['endoflife'] = time() + (int) $response['expires_in'];
-  update_option( 'govready_token', $response );
+  variable_set( 'govready_token', $response );
 
   if ($return) {
     return $response;
@@ -165,6 +173,17 @@ function govready_api_proxy() {
   drupal_json_output($response);
 
 }
+
+
+/**
+ * Call the GovReady Agent trigger.
+ */
+function govready_trigger() {
+
+  return 'ASDF';
+
+}
+
 
 
 /**
@@ -204,19 +223,19 @@ function govready_api_proxy() {
  * Implements hook_theme().
  */
 function govready_theme() {
-  //$path = drupal_get_path('module', 'govready');
-  global $base_url;
+  $path = drupal_get_path('module', 'govready');
+  $variables = array(
+    'logo' => url($path . '/images/logo.png'),
+    'path' => '',
+  );
   return array(
     'govready_connect' => array(
       'template' => 'templates/govready-connect',
-      'variables' => array(
-        'logo' => '',
-        'path' => '',
-      )
+      'variables' => $variables,
     ),
     'govready_dashboard' => array(
       'template' => 'templates/govready-dashboard',
-      'variables' => array()
+      'variables' => $variables,
     ),
   );
 }
