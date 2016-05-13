@@ -1,5 +1,4 @@
 import Plugins from './Plugins';
-import Modules from './Modules';
 import Measures from './Measures';
 import Domains from './Domains';
 import Accounts from './Accounts';
@@ -12,7 +11,6 @@ import CmsVulnerabilities from './CmsVulnerabilities';
 
 const widgets = {
   Plugins,
-  Modules,
   Measures,
   Domains,
   Accounts,

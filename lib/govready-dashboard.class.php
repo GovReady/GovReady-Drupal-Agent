@@ -36,10 +36,6 @@ class GovreadyDashboard {
       'trigger_endpoint' => url('govready/trigger'),
     );
 
-    // Enqueue Bootstrap
-    //drupal_add_css('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', 'external');
-    drupal_add_js('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js', 'external');
-
     // First time using app, need to set everything up
     if( empty($options['refresh_token']) ) {
 
@@ -80,11 +76,19 @@ class GovreadyDashboard {
       drupal_add_js(array('govready' => $settings), 'setting');
 
       // Enqueue react
-      drupal_add_js( $path . 'client/dist/vendor.dist.js' );
-      drupal_add_js( $path . 'client/dist/app.dist.js' ); // @todo? , array('govready-dashboard-app-vendor')
+      drupal_add_js( $path . 'client/dist/vendor.dist.js', array(
+        'scope' => 'footer',
+        'group' => 'GovReady',
+        'weight' => 1,
+      ));
+      drupal_add_js( $path . 'client/dist/app.dist.js', array(
+        'scope' => 'footer',
+        'group' => 'GovReady',
+        'weight' => 2,
+      ));
       drupal_add_css ( $path . 'client/dist/app.dist.css' );
 
-      return theme('govready_connect');
+      return theme('govready_dashboard');
 
     } // if()
 

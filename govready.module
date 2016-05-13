@@ -78,7 +78,6 @@ function govready_menu() {
  * Page callback for the GovReady Dashboard.
  */
 function govready_dashboard_callback() {
-
   module_load_include('class.php', 'govready', 'lib/govready-dashboard');
   $dashboard = new GovreadyDashboard;
   return $dashboard->dashboard_page();

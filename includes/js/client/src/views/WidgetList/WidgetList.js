@@ -20,7 +20,7 @@ class WidgetsListPage extends Component {
       <div className='widget-layout'>
         <div className='row row-first'>
           <div className='col-sm-4 col-md-4'>
-            {renderWidget('Modules')}
+            {renderWidget('Plugins')}
           </div>
           <div className='col-sm-4 col-md-4'>
             {renderWidget('Domains')}
