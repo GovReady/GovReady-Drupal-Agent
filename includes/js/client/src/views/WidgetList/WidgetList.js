@@ -28,9 +28,6 @@ class WidgetsListPage extends Component {
           <div className='col-sm-4 col-md-4'>
             {renderWidget('Accounts', {widgetType: 'default'})}
           </div>
-          <div className='col-sm-4 col-md-4'>
-            {false && renderWidget('Measures')}
-          </div>
         </div>
         <div className='row row-third'>
           <div className='col-sm-6'>

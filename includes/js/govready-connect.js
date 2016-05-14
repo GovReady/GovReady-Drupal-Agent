@@ -48,81 +48,81 @@
   });
 
 
-  // Initialize the site by pinging the GovReady servers
-  // Makes calls to admin.php?action=govready_proxy&endpoint=:endpoint, which
-  // calls the GovReady API.
-  var remoteSteps = [
-    'ping',
-    'domain',
-    'plugins',
-    'accounts',
-    'stack'
-  ];
-  var initRemote = function( completed ) {
-    if (completed >= remoteSteps.length) {
-      location.reload();
-    }
-    else {
-      jQuery.post(
-        settings.govready_connect.api_endpoint + '?endpoint=/monitor/' + settings.govready_connect.siteId + '/' + remoteSteps[completed], 
-        {}, 
-        function(response){
-          // We're in local mode
-          if (completed === 0 && response.indexOf('err') !== -1) {
-            console.log('LOCAL');
-            $('#signup-loading').hide();
-            $('#local-mode').show();
-          }
-          else {
-            completed ++;
-            initRemote( completed );
-          }
-        }
-      );
-    }
-  }  // function
+  // // Initialize the site by pinging the GovReady servers
+  // // Makes calls to admin.php?action=govready_proxy&endpoint=:endpoint, which
+  // // calls the GovReady API.
+  // var remoteSteps = [
+  //   'ping',
+  //   'domain',
+  //   'plugins',
+  //   'accounts',
+  //   'stack'
+  // ];
+  // var initRemote = function( completed ) {
+  //   if (completed >= remoteSteps.length) {
+  //     location.reload();
+  //   }
+  //   else {
+  //     jQuery.post(
+  //       settings.govready_connect.api_endpoint + '?endpoint=/monitor/' + settings.govready_connect.siteId + '/' + remoteSteps[completed], 
+  //       {}, 
+  //       function(response){
+  //         // We're in local mode
+  //         if (completed === 0 && response.indexOf('err') !== -1) {
+  //           console.log('LOCAL');
+  //           $('#signup-loading').hide();
+  //           $('#local-mode').show();
+  //         }
+  //         else {
+  //           completed ++;
+  //           initRemote( completed );
+  //         }
+  //       }
+  //     );
+  //   }
+  // }  // function
 
 
-  // Enable localhost mode
-  // We call the admin.php?action=govready_v1_trigger endpoints that the
-  // GovReady API calls
-  // @todo: make this work
-  var localSteps = [
-    { key: 'activateLocal' },
-    { key: 'plugins', endpoint: 'plugins' },
-    { key: 'accounts', endpoint: 'accounts' },
-    { key: 'stack', endpoint: 'stack' }
-  ];
-  var initLocal = function( completed ) {
-    if (completed >= remoteSteps.length) {
-      location.reload();
-    }
-    else {
-      var data = localSteps[completed];
-      data.siteId = settings.govready_connect.siteId;
-      // @todo: data._ajax_nonce = govready_connect.nonce;
+  // // Enable localhost mode
+  // // We call the admin.php?action=govready_v1_trigger endpoints that the
+  // // GovReady API calls
+  // // @todo: make this work
+  // var localSteps = [
+  //   { key: 'activateLocal' },
+  //   { key: 'plugins', endpoint: 'plugins' },
+  //   { key: 'accounts', endpoint: 'accounts' },
+  //   { key: 'stack', endpoint: 'stack' }
+  // ];
+  // var initLocal = function( completed ) {
+  //   if (completed >= remoteSteps.length) {
+  //     location.reload();
+  //   }
+  //   else {
+  //     var data = localSteps[completed];
+  //     data.siteId = settings.govready_connect.siteId;
+  //     // @todo: data._ajax_nonce = govready_connect.nonce;
 
-      $.ajax({
-        "async": true,
-        "url": settings.govready_connect.trigger_endpoint,
-        "method": "POST",
-        //contentType: "application/x-form-urlencoded",
-        "data": data,
-        success: function(response) {
-          completed ++;
-          initLocal( completed );
-        },
-        error: function() {
-          initLocal( completed );
-        }
-      });
+  //     $.ajax({
+  //       "async": true,
+  //       "url": settings.govready_connect.trigger_endpoint,
+  //       "method": "POST",
+  //       //contentType: "application/x-form-urlencoded",
+  //       "data": data,
+  //       success: function(response) {
+  //         completed ++;
+  //         initLocal( completed );
+  //       },
+  //       error: function() {
+  //         initLocal( completed );
+  //       }
+  //     });
 
-    }
-  } // function
-  $('#local-mode-continue').bind('click', function(e) {
-    e.preventDefault();
-    initLocal(0);
-  });
+  //   }
+  // } // function
+  // $('#local-mode-continue').bind('click', function(e) {
+  //   e.preventDefault();
+  //   initLocal(0);
+  // });
 
 
 
