@@ -20,7 +20,7 @@ else if(window.Drupal && window.Drupal.settings.govready) {
   config.plugText = 'Module';
   config.cmsNice = 'Drupal';
   let url = '/govready/api?';
-  config.apiTrigger = 'govready/trigger';
+  config.apiTrigger = '/govready/trigger';
   if(process.env.NODE_ENV === 'development') {
     url = 'http://localhost:80/govready/api?';
     config.apiTrigger = 'http://localhost:80/govready/trigger';
