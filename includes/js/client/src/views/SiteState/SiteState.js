@@ -1,5 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { hashHistory } from 'react-router';
+import { WidgetList } from '../WidgetList';
 import { bindActionCreators } from 'redux';
 import config from 'config';
 import { 
@@ -18,8 +20,15 @@ class SiteState extends Component {
     }
   }
 
+  componentWillReceiveProps (nextProps) {
+    if(nextProps.siteState && nextProps.siteState === SITE_LOADED) {
+      hashHistory.push('/dashboard');
+    }
+  } 
+
   goLocalClick(event) {
     event.preventDefault();
+    this.props.actions.siteLocalCheckPostAll();
   }
 
   render () {
@@ -34,7 +43,7 @@ class SiteState extends Component {
             or behind a password wall.</p>
             <p>You can still use GovReady, however we will not be able to automatically refresh your
             information and some data (information about your domain name, etc) will not be available</p>
-            <p><a href="#" onClick={this.goLocalClick} id="local-mode-continue" className="btn btn-primary">Continue in Localhost mode</a></p>
+            <p><a href="#" onClick={this.goLocalClick.bind(this)} id="local-mode-continue" className="btn btn-primary">Continue in Localhost mode</a></p>
           </div>
         )
       case SITE_LOCAL_CHECK_FAILED:
@@ -44,15 +53,10 @@ class SiteState extends Component {
             <p>GovReady has been notified, please try again later or contact us.</p>
           </div>
         )
-      case SITE_LOADED:
-        return (
-          <h1>We loaded!!!!!!!!!!!</h1>
-        )
       default:
         return (
           <div className='loading'>
             <i className='fa fa-spinner fa-2x fa-spin'></i><span className='sr-only'>Loading</span>
-            {this.props.siteState}
             <p>We are collecting data about your site. It should only take a minute.  After we have collected your initial data, 
             GovReady will automatically contact your site periodically to keep the data up-to-date. Learn more 
             (@todo: links to GitHub/README with information about the info we collect, etc).</p>

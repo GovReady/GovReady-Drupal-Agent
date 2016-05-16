@@ -188,7 +188,7 @@ export function siteCheckPostAll(): Function {
     ];
     dispatch(siteChecking());
     return Promise.all(calls.map((call) => {
-      return dispatch(siteCheckPost(call.url, isLocal, call.data));
+      return dispatch(siteCheckPost(call.url, true, isLocal, call.data));
     })).then((returns) => {
       let error;
       // Check results for errors
@@ -220,34 +220,38 @@ export function siteLocalCheckPostAll(): Function {
       {
         url: config.apiTrigger,
         data: {
-          key: activateLocal
+          key: 'activateLocal',
+          siteId: config.siteId
         }
       },
       {
         url: config.apiTrigger,
         data: {
           key: 'plugins',
-          endpoint: 'plugins'
+          endpoint: 'plugins',
+          siteId: config.siteId
         }
       },
       {
         url: config.apiTrigger,
         data: {
           key: 'accounts',
-          endpoint: 'accounts'
+          endpoint: 'accounts',
+          siteId: config.siteId
         }
       },
       {
         url: config.apiTrigger,
         data: {
           key: 'stack',
-          endpoint: 'stack'
+          endpoint: 'stack',
+          siteId: config.siteId
         }
       }
     ];
     dispatch(siteLocalChecking());
     return Promise.all(calls.map((call) => {
-      return dispatch(siteCheckPost(call.url, isLocal, call.data));
+      return dispatch(siteCheckPost(call.url, false, true, call.data));
     })).then((returns) => {
       let error;
       // Check results for errors
@@ -284,7 +288,8 @@ export const actions = {
   siteCheckPost,
   sitePreCheck,
   sitePingCheck,
-  siteCheckPostAll
+  siteCheckPostAll,
+  siteLocalCheckPostAll
 }
 
 // ------------------------------------

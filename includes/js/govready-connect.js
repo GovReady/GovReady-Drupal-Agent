@@ -34,9 +34,10 @@
         console.log(response);
         if (response.id_token != undefined) {
           // Ladies and gentlemen, start your engines
-          $('#signup-content').hide();
-          $('#signup-loading').show();
-          initRemote(0);
+          // $('#signup-content').hide();
+          // $('#signup-loading').show();
+          // initRemote(0);
+          location.reload();
         }
         else {
           // @todo
