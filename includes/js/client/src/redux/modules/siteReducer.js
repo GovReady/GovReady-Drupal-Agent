@@ -85,6 +85,7 @@ export function siteCheckPost (url: string, appendUrl: boolean, isLocal: boolean
     // Load data
     return fetch(url, {
       method: 'post',
+      credentials: 'same-origin',
       body: form_data
     }).then((response: object) => {
       // Good?
