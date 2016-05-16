@@ -41,7 +41,8 @@ function govready_permission() {
  */
 function govready_menu() {
   $items['admin/reports/govready'] = array(
-    'title' => 'GovReady Dashboard',
+    'title' => t('GovReady Dashboard'),
+    'description' => t('A dasboard providing an overview of current hosting and security configuration with suggestions for government websites to achieve FISMA compliance.'),
     'page callback' => 'govready_dashboard_callback',
     'page arguments' => array(),
     'access arguments' => array('view govready'), // @todo: what if user only has administer govready permission?
