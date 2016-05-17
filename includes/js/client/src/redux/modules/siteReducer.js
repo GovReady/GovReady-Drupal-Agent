@@ -192,7 +192,7 @@ export function siteCheckPostAll(): Function {
     ];
     dispatch(siteChecking());
     return Promise.all(calls.map((call) => {
-      return dispatch(siteCheckPost(call.url, true, isLocal, call.data));
+      return dispatch(siteCheckPost(call.url, true, false, {}));
     })).then((returns) => {
       let error;
       // Check results for errors
