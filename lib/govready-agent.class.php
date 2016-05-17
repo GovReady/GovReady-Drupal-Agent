@@ -34,7 +34,7 @@ class GovreadyAgent { //extends Govready\Govready {
         print_r($data);
         if (!empty($data)) {
           //print_r($data);return;
-          $endpoint = '/sites/' . $options['siteId'] . '/' . $_POST['endpoint'];
+          $endpoint = '/sites/' . $options['siteId'] . '/' . !empty($_POST['endpoint']) ? $_POST['endpoint'] : '';
           $return = govready_api( $endpoint, 'POST', $data );
           print_r($data);
           print_r($return); // @todo: comment this out, also don't return data in API
