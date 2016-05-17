@@ -115,4 +115,16 @@ class GovreadyAgent { //extends Govready\Govready {
   }
 
 
+  // Callback for ?action=govready_v1_trigger&key=changeMode
+  private function changeMode() {
+    
+    $options = variable_get( 'govready_options', array() );
+    $options['mode'] = $_POST['mode'];
+    variable_set('govready_options', $options);
+
+    return array( 'mode' => $options['mode'] );
+
+  }
+
+
 } // class

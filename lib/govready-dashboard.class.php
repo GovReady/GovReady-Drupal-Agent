@@ -70,7 +70,8 @@ class GovreadyDashboard {
       // Save some JS variables (available at govready.siteId, etc)
       drupal_add_js( $path . 'govready.js' );
       $settings = array_merge(array(
-        'siteId' => !is_null($options['siteId']) ? $options['siteId'] : null, 
+        'siteId' => !is_null($options['siteId']) ? $options['siteId'] : null,
+        'mode' => !empty($options['mode']) ? $options['mode'] : 'remote',
         //@todo: 'nonce' => wp_create_nonce( $this->key )
       ), $settings);
       drupal_add_js(array('govready' => $settings), 'setting');
