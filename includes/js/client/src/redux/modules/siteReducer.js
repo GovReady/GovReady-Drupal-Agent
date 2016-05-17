@@ -60,8 +60,8 @@ export function siteLocalCheckFailed (error: object): Action {
 }
 
 // Changes site status
-export function siteLoaded (): Action {
-  return { type: SITE_LOADED };
+export function siteLoaded (mode: string): Action {
+  return { type: SITE_LOADED, mode: mode };
 }
 
 // Calls endpoint
@@ -120,12 +120,15 @@ export function sitePreCheck(calls: Array, isLocal: boolean ): Function {
       if(!(res instanceof Error)) {
         // @TODO Cache all these endpoints
         let allSet = true;
-        const endpoints = [
-          'domain',
+        let endpoints = [
           'stack',
           'accounts',
           'plugins'
         ]; 
+        // If we're not in local, check domains
+        if(config.mode !== 'local') {
+          endpoints.push('domains');
+        }
         endpoints.map((endpoint) => {
           if(res[endpoint]) {
             allSet = allSet;
@@ -134,7 +137,7 @@ export function sitePreCheck(calls: Array, isLocal: boolean ): Function {
           }
         })
         if(allSet) {
-          dispatch(siteLoaded());
+          dispatch(siteLoaded(config.mode ? config.mode : 'remote'));
           return;
         }
       }
@@ -204,7 +207,7 @@ export function siteCheckPostAll(): Function {
         dispatch(siteCheckFailed(error));
       }
       else {
-        dispatch(siteLoaded());
+        dispatch(siteLoaded('remote'));
       }
       
     })
@@ -221,7 +224,8 @@ export function siteLocalCheckPostAll(): Function {
       {
         url: config.apiTrigger,
         data: {
-          key: 'activateLocal',
+          key: 'changeMode',
+          mode: 'local',
           siteId: config.siteId
         }
       },
@@ -266,7 +270,7 @@ export function siteLocalCheckPostAll(): Function {
         dispatch(siteLocalCheckFailed(error));
       }
       else {
-        dispatch(siteLoaded());
+        dispatch(siteLoaded('local'));
       }
       
     })
@@ -349,9 +353,10 @@ const ACTION_HANDLERS = {
     });
   },
   
-  [SITE_LOADED]: (state: object): object => {
+  [SITE_LOADED]: (state: object, action: {mode: string}): object => {
     return objectAssign({}, {
-      'status': SITE_LOADED
+      'status': SITE_LOADED,
+      'mode': action.mode
     });
   }
 
@@ -362,7 +367,8 @@ const ACTION_HANDLERS = {
 // ------------------------------------
 
 const initialState = {
-  status: 'init'
+  status: 'init',
+  mode: config.mode
 };
 
 export default function siteReducer (state: object = initialState, action: Action): object {

@@ -40,10 +40,10 @@ class WidgetsListPage extends Component {
         </div>
         <div className='row row-fourth'>
           <div className='col-sm-6'>
-            {renderWidget('Contacts')}
+            {renderWidget('Accounts', {widgetType: 'inactive'})}
           </div>
           <div className='col-sm-6'>
-            {renderWidget('Accounts', {widgetType: 'inactive'})}
+            {renderWidget('Contacts')}
           </div>
         </div>
       </div>
