@@ -55,15 +55,18 @@ class GovreadyAgent { //extends Govready\Govready {
     // Hint to use system_rebuild_module_data() came from 
     // http://stackoverflow.com/questions/4232113/drupal-how-to-get-the-modules-list
     $modules = system_rebuild_module_data();
+    //print_r($modules);
     
     foreach ($modules as $key => $module) {
-      array_push( $out, array(
-        'label' => $module->info['name'],
-        'namespace' => $key,
-        'status' => $module->status,
-        'version' => $module->info['version'],
-      ) );
-    }
+      if ( !(!empty($module->info['hidden']) && $module->info['hidden'] == 1) ) {
+        array_push( $out, array(
+          'label' => $module->info['name'],
+          'namespace' => $key,
+          'status' => $module->status,
+          'version' => $module->info['version'],
+        ) );
+      } //if
+    } //foreach
 
     return array( 'plugins' => $out, 'forceDelete' => true );
 
