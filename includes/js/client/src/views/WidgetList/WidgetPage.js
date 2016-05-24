@@ -13,9 +13,16 @@ class WidgetPage extends Component {
       if(!widgets[this.props.routeParams.widget]) {
         return true;
       }
-      // Individual page param, but no component
-      if(this.props.routeParams.individual && !widgets[this.props.routeParams.widget].pageIndividual) {
-        return true;
+      // Individual page param
+      if(this.props.routeParams.individual) {
+        // null or empty param
+        if(!widgets[this.props.routeParams.widget].pageIndividual) {
+          return true;
+        }
+        // Is a "new" path, but this widget doesn't support new
+        if(this.props.routeParams.individual === 'new' && !widgets[this.props.routeParams.widget].pageIndividualNew) {
+          return true;
+        }
       }
       // Page param, but no param
       if(!widgets[this.props.routeParams.widget].page) {
@@ -30,6 +37,7 @@ class WidgetPage extends Component {
       // Special page route? or generic ?
       if(this.props.routeParams.individual) {
         params.display = 'pageIndividual';
+        params.isNew = this.props.routeParams.individual === 'new' ? true : false;
         params.individual = this.props.routeParams.individual;
       }
       else {

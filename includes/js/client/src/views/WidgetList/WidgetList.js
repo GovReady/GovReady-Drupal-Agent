@@ -26,6 +26,9 @@ class WidgetsListPage extends Component {
             {renderWidget('Domains')}
           </div>
           <div className='col-sm-4 col-md-4'>
+            {renderWidget('Measures')}
+          </div>
+          <div className='col-sm-4 col-md-4'>
             {renderWidget('Accounts', {widgetType: 'default'})}
           </div>
         </div>
