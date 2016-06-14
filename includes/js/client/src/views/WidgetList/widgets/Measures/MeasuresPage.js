@@ -1,38 +1,55 @@
-import React, { PropTypes, Component } from 'react';
-import { Link } from 'react-router';
+import React, { PropTypes as PT, Component } from 'react';
 
 class MeasuresPage extends Component {
 
-  measuresList () {
-    if(this.props.measures && this.props.measures.length) {
+  measuresList (measures) {
+    if(measures && measures.length) {
       return (
         <div>
           {measures.map((measure, index) => (
-            <div key={index} className='measure'>
-              <h4><Link to={"/dashboard/Measures/" + measure._id}>{measure.title}</Link></h4>
+            <div key={index} className='measure row'>
+              <div className="col-sm-8">
+                  <h4>{this.props.createNewLink(measure.title, measure._id)}</h4>
+                </div>
+              <div className="col-sm-4">
+                <h4>{this.props.nextSubmissionDue(measure)}</h4>
+              </div>
+              <div className="col-xs-12">
+                <label>Template:</label>
+                <pre>
+                  {measure.body}
+                </pre>
+              </div>
             </div>
           ))}
+          <div className="alert alert-info">
+            <span>Add {this.props.createNewLink('additional measures')}.</span>
+          </div>
         </div>
       )
     }
     // No measures, return empty
-    return this.props.emptyText;
+    return (
+      <div className="alert alert-warning">
+        <span>No measures added. Please {this.props.createNewLink('add some')}!</span>
+      </div>
+    );
   }
 
   render () {
     return (
       <div>
         {this.props.header}
-        {this.measuresList()}
+        {this.measuresList(this.props.measures)}
       </div>
     );
   }
 }
 
 MeasuresPage.propTypes = {
-  header: PropTypes.object.isRequired,
-  emptyText: PropTypes.object.isRequired,
-  measures: PropTypes.array.isRequired
+  header: PT.object.isRequired,
+  createNewLink: PT.func.isRequired,
+  measures: PT.array.isRequired
 };
 
 export default MeasuresPage;
