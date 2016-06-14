@@ -1,10 +1,5 @@
-import React, { Component, PropTypes } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { actions } from '../../redux/modules/widgetReducer';
+import React, { Component, PropTypes as PT } from 'react';
 import widgets from './widgets';
-
-console.log(widgets);
 
 class WidgetsListPage extends Component {
   
@@ -26,19 +21,24 @@ class WidgetsListPage extends Component {
             {renderWidget('Domains')}
           </div>
           <div className='col-sm-4 col-md-4'>
-            {renderWidget('Measures')}
+            
           </div>
           <div className='col-sm-4 col-md-4'>
             {renderWidget('Accounts', {widgetType: 'default'})}
           </div>
         </div>
-        <div className='row row-third'>
+        <div className='row row-seco'>
           <div className='col-sm-6'>
             {renderWidget('Stack')}
           </div>
           <div className='col-sm-6'>
             {renderWidget('Recommended')}
             {renderWidget('CmsVulnerabilities')}
+          </div>
+        </div>
+        <div className='row row-third'>
+          <div className='col-sm-12'>
+            {renderWidget('Measures')}
           </div>
         </div>
         <div className='row row-fourth'>
@@ -54,24 +54,4 @@ class WidgetsListPage extends Component {
   }
 }
 
-WidgetsListPage.propTypes = {
-  actions: PropTypes.object.isRequired,
-  appState: PropTypes.object.isRequired
-};
-
-function mapStateToProps (state) {
-  return {
-    appState: state.widgetState
-  };
-}
-
-function mapDispatchToProps (dispatch) {
-  return {
-    actions: bindActionCreators(actions, dispatch)
-  };
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WidgetsListPage);
+export default WidgetsListPage;
