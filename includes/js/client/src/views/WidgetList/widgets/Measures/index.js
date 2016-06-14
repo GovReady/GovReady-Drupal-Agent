@@ -5,5 +5,6 @@ export default {
   widget: true,
   page: true,
   pageIndividual: true,
-  pageIndividualNew: true
+  pageIndividualNew: true,
+  pageIndividualView: true
 }
