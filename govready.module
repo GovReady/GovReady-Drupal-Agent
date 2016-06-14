@@ -155,7 +155,7 @@ function govready_refresh_token( $return = false ) {
   
   // @todo: nonce this call
   $options = variable_get( 'govready_options' );
-  if ( $_REQUEST['refresh_token'] ) {
+  if ( !empty($_REQUEST['refresh_token']) && $_REQUEST['refresh_token'] ) {
     // Validate the nonce
     //if (check_ajax_referer( $this->key, '_ajax_nonce' )) {
     //  //return;
