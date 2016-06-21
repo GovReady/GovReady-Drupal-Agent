@@ -27,7 +27,6 @@
     }
 
     // Save the refresh token in WordPress
-    console.log(settings.govready_connect.token_endpoint);
     jQuery.post(
       settings.govready_connect.token_endpoint, 
       {
