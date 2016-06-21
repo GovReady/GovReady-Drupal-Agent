@@ -68,7 +68,6 @@ class GovreadyDashboard {
     else {
     
       // Save some JS variables (available at govready.siteId, etc)
-      drupal_add_js( $path . 'govready.js' );
       $settings = array_merge(array(
         'siteId' => !is_null($options['siteId']) ? $options['siteId'] : null,
         'mode' => !empty($options['mode']) ? $options['mode'] : 'remote',
