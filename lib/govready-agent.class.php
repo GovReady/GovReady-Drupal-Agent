@@ -81,18 +81,19 @@ class GovreadyAgent { //extends Govready\Govready {
   private function accounts() {
     $out = array();
     
-    $users = entity_load('user');
+    $accounts = entity_load('user');
 
-    foreach ($users as $key => $user) {
+    foreach ($accounts as $key => $account) {
       if ($key > 0) {
         array_push( $out, array(
-          'userId' => $user->uid,
-          'username' => $user->name,
-          'email' => $user->mail,
-          'name' => $user->name,
-          'created' => $user->created,
-          'roles' => $user->roles,
-          'lastLogin' => date('c', $user->login),
+          'userId' => $account->uid,
+          'username' => $account->name,
+          'email' => $account->mail,
+          'name' => $account->name,
+          'created' => $account->created,
+          'roles' => array_values($account->roles),
+          'superAdmin' => user_access('administer site configuration', $account),
+          'lastLogin' => $account->login,
         ) );
       }
       
