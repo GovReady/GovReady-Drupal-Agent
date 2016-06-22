@@ -13,23 +13,20 @@ class InactiveAccountsWidget extends Component {
     }
     // Joins roles
     const printRoles = (user) => {
-      if(user.roles) {
-        return Object.values(user.roles).join(', ');
+      if(user.roles && user.roles.length) {
+        return user.roles.join(', ');
       }
     }
-    // Last login
-    const printLastLogin = (user) => {
-      if(!user.lastLogin) {
-        return 'Never';
-      }
-      let loginInt = parseInt(user.lastLogin);
-      // string
-      if(isNaN(loginInt)) {
-        return user.lastLogin;
-      }
-      // php timestamp
-      return window.moment(loginInt*1000).format('MMMM Do YYYY');
-    }
+    // // Last login
+    // const printLastLogin = (user) => {
+    //   let loginInt = parseInt(user.lastLogin);    
+    //   // string   
+    //   if(isNaN(loginInt)) {   
+    //     return user.lastLogin;    
+    //   }   
+    //   // php timestamp
+    //   return window.moment(loginInt*1000).format('MMMM Do YYYY');
+    // }
     return (
       <div className='table-responsive'>
         <table className='table'>
@@ -51,7 +48,7 @@ class InactiveAccountsWidget extends Component {
               <tr key={user.userId}>
                 <td>{user.name}</td>
                 <td>{printRoles(user)}</td>
-                <td>{printLastLogin(user)}</td>
+                <td>{user.lastLogin}</td>
               </tr>
             ))}
           </tbody>
