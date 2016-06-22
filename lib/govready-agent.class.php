@@ -22,7 +22,7 @@ class GovreadyAgent { //extends Govready\Govready {
    * ?action=govready_v1_trigger&key=stack&endpoint=stack/phpinfo&siteId=xxx
    */
   public function ping() {
-    print_r($_POST);
+    //print_r($_POST);
 
     $options = variable_get( 'govready_options' );
     // @todo: check that request is coming from plugin.govready.com, or is properly nonced (for manual refreshes)
@@ -38,8 +38,8 @@ class GovreadyAgent { //extends Govready\Govready {
           $endpoint .= !empty($_POST['endpoint']) ? $_POST['endpoint'] : '';
           // print_R($endpoint);
           $return = govready_api( $endpoint, 'POST', $data );
-          print_r($data);
-          print_r($return); // @todo: comment this out, also don't return data in API
+          //print_r($data);
+          //print_r($return); // @todo: comment this out, also don't return data in API
         }
       }
 
