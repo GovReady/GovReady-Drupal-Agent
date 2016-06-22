@@ -28,15 +28,15 @@ class GovreadyAgent { //extends Govready\Govready {
     // @todo: check that request is coming from plugin.govready.com, or is properly nonced (for manual refreshes)
     if ($_POST['siteId'] == $options['siteId']) {
 
-      $key = $_POST['key'];
-      if ( !empty($key) ) { 
+      if ( !empty($_POST['key']) ) { 
+        $key = $_POST['key'];
         $data = call_user_func( array($this, $key) );
         //print_r($data);
         if (!empty($data)) {
           //print_r($data);return;
           $endpoint = '/sites/' . $options['siteId'] . '/';
           $endpoint .= !empty($_POST['endpoint']) ? $_POST['endpoint'] : '';
-          print_R($endpoint);
+          // print_R($endpoint);
           $return = govready_api( $endpoint, 'POST', $data );
           print_r($data);
           print_r($return); // @todo: comment this out, also don't return data in API
@@ -57,15 +57,17 @@ class GovreadyAgent { //extends Govready\Govready {
     // Hint to use system_rebuild_module_data() came from 
     // http://stackoverflow.com/questions/4232113/drupal-how-to-get-the-modules-list
     $modules = system_rebuild_module_data();
-    //print_r($modules);
     
     foreach ($modules as $key => $module) {
-      if ( !(!empty($module->info['hidden']) && $module->info['hidden'] == 1) ) {
+      // Make sure not hidden or testing 
+      if ( !(!empty($module->info['hidden']) && $module->info['hidden'] == 1) 
+        && !(!empty($module->info['package']) && $module->info['package'] === 'Testing') ) {
         array_push( $out, array(
           'label' => $module->info['name'],
           'namespace' => $key,
           'status' => $module->status,
           'version' => $module->info['version'],
+          'project_link' => !empty( $module->info['project'] ) ? 'https://www.drupal.org/project/' . $module->info['project'] : ''
         ) );
       } //if
     } //foreach
@@ -90,7 +92,7 @@ class GovreadyAgent { //extends Govready\Govready {
           'name' => $user->name,
           'created' => $user->created,
           'roles' => $user->roles,
-          'lastLogin' => $user->login,
+          'lastLogin' => date('c', $user->login),
         ) );
       }
       
@@ -112,7 +114,7 @@ class GovreadyAgent { //extends Govready\Govready {
         'platform' => 'Drupal',
         'version' => VERSION, // @todo
       ),
-      'database' => null,
+      'database' => function_exists('mysql_get_client_info') ? 'MySQL ' . mysql_get_client_info() : null,
     );
 
     return array( 'stack' => $stack );
