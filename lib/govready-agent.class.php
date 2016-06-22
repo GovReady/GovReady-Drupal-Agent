@@ -22,7 +22,7 @@ class GovreadyAgent { //extends Govready\Govready {
    * ?action=govready_v1_trigger&key=stack&endpoint=stack/phpinfo&siteId=xxx
    */
   public function ping() {
-    print_r($_POST);
+    //print_r($_POST);
 
     $options = variable_get( 'govready_options' );
     // @todo: check that request is coming from plugin.govready.com, or is properly nonced (for manual refreshes)
@@ -38,8 +38,8 @@ class GovreadyAgent { //extends Govready\Govready {
           $endpoint .= !empty($_POST['endpoint']) ? $_POST['endpoint'] : '';
           // print_R($endpoint);
           $return = govready_api( $endpoint, 'POST', $data );
-          print_r($data);
-          print_r($return); // @todo: comment this out, also don't return data in API
+          //print_r($data);
+          //print_r($return); // @todo: comment this out, also don't return data in API
         }
       }
 
@@ -81,18 +81,19 @@ class GovreadyAgent { //extends Govready\Govready {
   private function accounts() {
     $out = array();
     
-    $users = entity_load('user');
+    $accounts = entity_load('user');
 
-    foreach ($users as $key => $user) {
+    foreach ($accounts as $key => $account) {
       if ($key > 0) {
         array_push( $out, array(
-          'userId' => $user->uid,
-          'username' => $user->name,
-          'email' => $user->mail,
-          'name' => $user->name,
-          'created' => $user->created,
-          'roles' => $user->roles,
-          'lastLogin' => date('c', $user->login),
+          'userId' => $account->uid,
+          'username' => $account->name,
+          'email' => $account->mail,
+          'name' => $account->name,
+          'created' => $account->created,
+          'roles' => array_values($account->roles),
+          'superAdmin' => user_access('administer site configuration', $account),
+          'lastLogin' => $account->login,
         ) );
       }
       
