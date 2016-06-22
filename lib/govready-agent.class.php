@@ -92,7 +92,7 @@ class GovreadyAgent { //extends Govready\Govready {
           'name' => $user->name,
           'created' => $user->created,
           'roles' => $user->roles,
-          'lastLogin' => date('c', $user->login),
+          'lastLogin' => $user->login,
         ) );
       }
       
