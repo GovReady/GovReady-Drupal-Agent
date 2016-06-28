@@ -16,7 +16,7 @@ function govready_config() {
       'client_id' => 'HbYZO5QXKfgNshjKlhZGizskiaJH9kGH'
     ),
     'commercial' => false,
-    'govready_url' => 'http://plugin.govready.com/v1.0',
+    'govready_url' => 'https://plugin.govready.com/v1.0',
     //'govready_url' => 'http://localhost:4000/v1.0', // NOTE: Docker can't see this!
   );
 }
