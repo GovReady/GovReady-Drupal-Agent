@@ -210,6 +210,7 @@ export function siteModeChange(mode: string, reset: boolean = '', redirect: stri
           siteId: config.siteId
       })
     ).then((res) => {
+      console.log(res);
       // We have an error
       if(res instanceof Error) {
         // Dispatch to local mode
