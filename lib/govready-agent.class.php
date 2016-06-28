@@ -59,19 +59,23 @@ class GovreadyAgent { //extends Govready\Govready {
     $modules = system_rebuild_module_data();
     
     foreach ($modules as $key => $module) {
-      // Make sure not hidden or testing 
+      // Make sure not hidden, testing, core, or submodule
       if ( !(!empty($module->info['hidden']) && $module->info['hidden'] == 1) 
-        && !(!empty($module->info['package']) && $module->info['package'] === 'Testing') ) {
+        && !(!empty($module->info['package']) && $module->info['package'] === 'Testing') 
+        && $module->info['project'] !== 'drupal'
+        && $module->info['project'] === $key
+      ) {
+        //print_r($module);
         array_push( $out, array(
           'label' => $module->info['name'],
           'namespace' => $key,
-          'status' => $module->status,
+          'status' => (boolean) $module->status,
           'version' => $module->info['version'],
           'project_link' => !empty( $module->info['project'] ) ? 'https://www.drupal.org/project/' . $module->info['project'] : ''
         ) );
       } //if
     } //foreach
-
+    
     return array( 'plugins' => $out, 'forceDelete' => true );
 
   }
@@ -81,9 +85,9 @@ class GovreadyAgent { //extends Govready\Govready {
   private function accounts() {
     $out = array();
     
-    $accounts = entity_load('user');
+    $users = entity_load('user');
 
-    foreach ($accounts as $key => $account) {
+    foreach ($users as $key => $user) {
       if ($key > 0) {
         array_push( $out, array(
           'userId' => $account->uid,
