@@ -12,7 +12,7 @@ if(window.govready) {
   }
   config.apiUrl = url + 'action=govready_proxy&endpoint=/sites/' + config.siteId + '/';
   config.apiUrlNoSite = url + 'action=govready_proxy&endpoint=';
-  config.apiTrigger = url + 'action=govready_v1_trigger&endpoint=/sites/' + config.siteId + '/';
+  config.apiTrigger = url + 'action=govready_v1_trigger';
   config.pluginUrl = 'https://wordpress.org/plugins/';
 }
 else if(window.Drupal && window.Drupal.settings.govready) {
@@ -23,8 +23,8 @@ else if(window.Drupal && window.Drupal.settings.govready) {
   let url = '/govready/api?';
   config.apiTrigger = '/govready/trigger?endpoint=/sites/' + config.siteId + '/';
   if(process.env.NODE_ENV === 'development') {
-    url = 'http://alex-UX303UA:32775/govready/api?';
-    config.apiTrigger = 'http://localhost:32775/govready/trigger?endpoint=/sites/' + config.siteId + '/';
+    url = 'http://alex-UX303UA:32777/govready/api?';
+    config.apiTrigger = 'http://localhost:32777/govready/trigger?endpoint=/sites/' + config.siteId + '/';
   }
   config.apiUrl = url + 'action=govready_proxy&endpoint=/sites/' + config.siteId + '/';
   config.apiUrlNoSite = url + 'action=govready_proxy&endpoint=';
