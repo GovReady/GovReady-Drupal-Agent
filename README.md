@@ -11,7 +11,7 @@ following current security best-practices.
 The GovReady Dashboard gives you a shared, easy-to-digest overview of the status of security on your
 website, including:
 * Drupal Core update status
-* Contributed plugin update status
+* Contributed module update status
 * Superadmin accounts
 * Site uptime monitoring
 * The status of your domain and SSL certificate renewals
@@ -25,13 +25,9 @@ website, including:
 
 
 ## Installation
-**NOT RECOMMENDED FOR PRODUCTION - UNDER ACTIVE DEVELOPMENT**
+Currently, we do not recommend installing this module on production websites.
 
-This module code is under active development and has not been fully vetted for reliability or security.
-
-That said, here is how to install the plugin and on say, your staging website.
-
-1. Download a zipped version of this repo.
+1. Download the module code, or install with Drush: `drush dl govready`.
 2. Copy the module code into `./sites/all/modules` (or similar).
 3. Log into Drupal and enable the module on `/admin/build/modules`, or enable with Drush (`drush en govready`).
 4. Go to `/admin/reports/govready`, create a GovReady account and proceed through the module auto-activation steps.

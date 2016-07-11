@@ -33,13 +33,15 @@ class GovreadyAgent { //extends Govready\Govready {
         $data = call_user_func( array($this, $key) );
         //print_r($data);
         if (!empty($data)) {
-          //print_r($data);return;
-          $endpoint = '/sites/' . $options['siteId'] . '/';
-          $endpoint .= !empty($_POST['endpoint']) ? $_POST['endpoint'] : '';
-          // print_R($endpoint);
-          $return = govready_api( $endpoint, 'POST', $data );
-          //print_r($data);
-          //print_r($return); // @todo: comment this out, also don't return data in API
+          if( !empty( $_POST['endpoint'] ) ) {
+            //print_r($data);return;
+            $endpoint = '/sites/' . $options['siteId'] . '/' . $_POST['endpoint'];
+            // print_R($endpoint);
+            $return = govready_api( $endpoint, 'POST', $data );
+            //print_r($return); // @todo: comment this out, also don't return data in API
+          }
+          // @TODO return meaningful information
+          drupal_json_output(array('response' => 'ok'));
         }
       }
 
