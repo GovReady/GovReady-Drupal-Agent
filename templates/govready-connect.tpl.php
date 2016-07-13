@@ -1,3 +1,12 @@
+<?php
+
+/**
+ * @file
+ * Template for the GovReady login screen.
+ *
+ * This is displayed before the site is initialized.
+ */
+?>
 <div class="container"><div class="col-xs-12">
   <h1 style="line-height: 65px;margin: 10px 0;">
     <img src="<?php print $logo ?>" style="height:50px;float:left;margin-right:10px;" alt="GovReady" />

@@ -1,65 +1,71 @@
 <?php
+
 /**
  * @file
  * Code for the GovReady module.
  */
 
-
 /**
  * GovReady configuration settings.
  */
 function govready_config() {
+
   return array(
-    'api_debug' => false,
+    'api_debug' => FALSE,
     'auth0' => array(
       'domain' => 'govready.auth0.com',
-      'client_id' => 'HbYZO5QXKfgNshjKlhZGizskiaJH9kGH'
+      'client_id' => 'HbYZO5QXKfgNshjKlhZGizskiaJH9kGH',
     ),
-    'commercial' => false,
+    'commercial' => FALSE,
     'govready_url' => 'https://plugin.govready.com/v1.0',
-    //'govready_url' => 'http://localhost:4000/v1.0', // NOTE: Docker can't see this!
   );
+
 }
 
 /**
  * Implements hook_permission().
  */
 function govready_permission() {
+
   return array(
     'view govready' => array(
       'title' => t('Access the GovReady dashboard'),
     ),
     'administer govready' => array(
       'title' => t('Set up and configure the GovReady dashboard'),
-    ),    
+    ),
   );
-}
 
+}
 
 /**
  * Implements hook_menu().
  */
 function govready_menu() {
+
   $items['admin/reports/govready'] = array(
-    'title' => t('GovReady Dashboard'),
-    'description' => t('A dasboard providing an overview of current hosting and security configuration with suggestions for government websites to achieve FISMA compliance.'),
+    'title' => 'GovReady Dashboard',
+    'description' => 'A dasboard providing an overview of current hosting and security configuration with suggestions for government websites to achieve FISMA compliance.',
     'page callback' => 'govready_dashboard_callback',
     'page arguments' => array(),
-    'access arguments' => array('view govready'), // @todo: what if user only has administer govready permission?
+    // @todo: what if user only has administer govready permission?
+    'access arguments' => array('view govready'),
     'type' => MENU_NORMAL_ITEM,
   );
 
   $items['govready/api'] = array(
     'page callback' => 'govready_api_proxy',
     'page arguments' => array(),
-    'access arguments' => array('view govready'), // @todo: what if user only has administer govready permission?
+    // @todo: what if user only has administer govready permission?
+    'access arguments' => array('view govready'),
     'type' => MENU_CALLBACK,
   );
 
   $items['govready/refresh-token'] = array(
     'page callback' => 'govready_refresh_token',
     'page arguments' => array(),
-    'access arguments' => array('view govready'), // @todo: what if user only has administer govready permission?
+    // @todo: what if user only has administer govready permission?
+    'access arguments' => array('view govready'),
     'type' => MENU_CALLBACK,
   );
 
@@ -67,24 +73,24 @@ function govready_menu() {
     'page callback' => 'govready_trigger_callback',
     'page arguments' => array(),
     'access callback' => TRUE,
-    //'access arguments' => array('view govready'), // @todo: what if user only has administer govready permission?
+    // 'access arguments' => array('view govready'),.
     'type' => MENU_CALLBACK,
   );
 
   return $items;
-}
 
+}
 
 /**
  * Page callback for the GovReady Dashboard.
  */
 function govready_dashboard_callback() {
+
   module_load_include('class.php', 'govready', 'lib/govready-dashboard');
-  $dashboard = new GovreadyDashboard;
-  return $dashboard->dashboard_page();
+  $dashboard = new GovreadyDashboard();
+  return $dashboard->dashboardPage();
 
 }
-
 
 /**
  * Call the GovReady Agent trigger.
@@ -92,57 +98,57 @@ function govready_dashboard_callback() {
 function govready_trigger_callback() {
 
   module_load_include('class.php', 'govready', 'lib/govready-agent');
-  $agent = new GovreadyAgent;
+  $agent = new GovreadyAgent();
   return $agent->ping();
 
 }
 
-
 /**
  * Make a request to the GovReady API.
  */
-function govready_api( $endpoint, $method = 'GET', $data = array(), $anonymous = false ) {
+function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = FALSE) {
+
   $config = govready_config();
   $url = $config['govready_url'] . $endpoint;
 
-  // Make sure our token is a-ok
-  $token = variable_get( 'govready_token', array() );
+  // Make sure our token is a-ok.
+  $token = variable_get('govready_token', array());
 
-  if ( !$anonymous && ( empty($token['id_token']) || empty($token['endoflife']) || $token['endoflife'] < time() ) ) {
-    $token = govready_refresh_token( true );
+  if (!$anonymous && (empty($token['id_token']) || empty($token['endoflife']) || $token['endoflife'] < time())) {
+    $token = govready_refresh_token(TRUE);
   }
-  $token = !$anonymous && !empty($token['id_token']) ? $token['id_token'] : false;
+  $token = !$anonymous && !empty($token['id_token']) ? $token['id_token'] : FALSE;
 
-  // Make the API request with cURL
+  // Make the API request with cURL.
   // @todo should we support HTTP_request (https://pear.php.net/manual/en/package.http.http-request.intro.php)?
-  $headers = array( 'Content-Type: application/json' );
-  if ( $token ) {
-    array_push( $headers, 'Authorization: Bearer ' . $token );
+  $headers = array('Content-Type: application/json');
+  if ($token) {
+    array_push($headers, 'Authorization: Bearer ' . $token);
   }
   $curl = curl_init();
   curl_setopt($curl, CURLOPT_URL, $url);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-  if ( $data ) {
+  if ($data) {
     curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
   }
   curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
-  // Only for debugging
-  if ( !empty($config['api_debug']) && $config['api_debug'] ) {
+  // Only for debugging.
+  if (!empty($config['api_debug']) && $config['api_debug']) {
     print_r($url);
   }
-  
+
   $response = curl_exec($curl);
   curl_close($curl);
-  
-  // Only for debugging
-  if ( !empty($config['api_debug']) && $config['api_debug'] ) {
+
+  // Only for debugging.
+  if (!empty($config['api_debug']) && $config['api_debug']) {
     print_r($data);
     print_r($response);
   }
 
-  $response = json_decode( $response, true );
+  $response = json_decode($response, TRUE);
 
   return $response;
 
@@ -151,26 +157,22 @@ function govready_api( $endpoint, $method = 'GET', $data = array(), $anonymous =
 /**
  * Refresh the access token.
  */
-function govready_refresh_token( $return = false ) {
-  
+function govready_refresh_token($return = FALSE) {
+
   // @todo: nonce this call
-  $options = variable_get( 'govready_options' );
-  if ( !empty($_REQUEST['refresh_token']) && $_REQUEST['refresh_token'] ) {
-    // Validate the nonce
-    //if (check_ajax_referer( $this->key, '_ajax_nonce' )) {
-    //  //return;
-    //}
+  $options = variable_get('govready_options');
+  if (!empty($_REQUEST['refresh_token']) && $_REQUEST['refresh_token']) {
     $token = $_REQUEST['refresh_token'];
     $options['refresh_token'] = $token;
-    variable_set( 'govready_options', $options );
+    variable_set('govready_options', $options);
   }
   else {
     $token = !empty($options['refresh_token']) ? $options['refresh_token'] : '';
   }
 
-  $response = govready_api( '/refresh-token', 'POST', array( 'refresh_token' => $token), true );
+  $response = govready_api('/refresh-token', 'POST', array('refresh_token' => $token), TRUE);
   $response['endoflife'] = time() + (int) $response['expires_in'];
-  variable_set( 'govready_token', $response );
+  variable_set('govready_token', $response);
 
   if ($return) {
     return $response;
@@ -181,62 +183,28 @@ function govready_refresh_token( $return = false ) {
 
 }
 
-
 /**
  * Call the GovReady API.
  */
 function govready_api_proxy() {
 
   $method = !empty($_REQUEST['method']) ? $_REQUEST['method'] : $_SERVER['REQUEST_METHOD'];
-  $response = govready_api( $_REQUEST['endpoint'], $method, $_REQUEST );
+  $response = govready_api($_REQUEST['endpoint'], $method, $_REQUEST);
   drupal_json_output($response);
 
 }
-
-
-
-/**
- * Returns the path to the JS app.
- */
-/*function govready_app_path() {
-  return drupal_get_path('module', 'govready') .'/js/angular-311/dist/';
-}*/
-
-/**
- * Implements hook_library().
- */
-/*function govready_library() {
-  $path = govready_app_path();
-  $js_settings = array('scope' => 'footer', 'weight' => 5);
-  $libraries['angular-311'] = array(
-    'title' => 'Angular 311 App',
-    'website' => 'http://albatrossdigital.com',
-    'version' => '0.1',
-    'js' => array(
-      libraries_get_path('angular') . '/angular.min.js' => $js_settings,
-      $path . 'js/libraries.min.js' => $js_settings,
-      $path . 'js/app.min.js' => $js_settings,
-      drupal_get_path('module', 'govready') . '/js/angular-311.js' => $js_settings,
-    ),
-    'css' => array(
-      $path . 'css/app.min.css' => array('weight' => 1),
-    ),
-  );
-  //dpm($libraries);
-  return $libraries;
-}*/
-
-
 
 /**
  * Implements hook_theme().
  */
 function govready_theme() {
+
   $path = drupal_get_path('module', 'govready');
   $variables = array(
     'logo' => url($path . '/images/logo.png'),
     'path' => '',
   );
+
   return array(
     'govready_connect' => array(
       'template' => 'templates/govready-connect',
@@ -247,25 +215,5 @@ function govready_theme() {
       'variables' => $variables,
     ),
   );
+
 }
-
-
-/**
- * Implements hook_theme_preprocess().
- */
-/*function template_preprocess_govready_app(&$variables) {
-  //dpm($variables);
-  $vocabulary = taxonomy_vocabulary_machine_name_load('faq_category');
-  drupal_add_library('govready', 'angular-311');
-  $variables['app_id'] = 'angular-311-app-' . $variables['id'];
-  $settings = array(
-    'app_id' => $variables['app_id'],
-    'app_path' => $variables['app_path'],
-    'api_path' => $variables['api_path'],
-    'app_page_display' => $variables['conf']['page_display'],
-    'payment_url' => 'http://workhorse.albatrossdigital.com/payment-callback.php',
-    'track_url' => 'http://markaspot.helmcivic.com/georeport/v2',
-    'vocabulary_vid' => $vocabulary->vid,
-  );
-  drupal_add_js(array('govready' => $settings), 'setting');
-}*/
