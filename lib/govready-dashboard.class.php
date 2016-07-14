@@ -15,7 +15,7 @@ class GovreadyDashboard {
   /**
    * Construct function.
    */
-  private function __construct() {
+  function __construct() {
     $this->path = drupal_get_path('module', 'govready');
     $this->config = govready_config();
   }

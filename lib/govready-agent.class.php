@@ -13,12 +13,6 @@
 class GovreadyAgent {
 
   /**
-   * Construct function.
-   */
-  private function __construct() {
-  }
-
-  /**
    * Generic callback for ?action=govready_v1_trigger&key&endpoint&siteId.
    *
    * Examples:
@@ -41,6 +35,7 @@ class GovreadyAgent {
             // print_r($data);
             $endpoint = '/sites/' . $options['siteId'] . '/' . $_POST['endpoint'];
             $return = govready_api($endpoint, 'POST', $data);
+            // drupal_json_output($data);
             // print_r($return);
           }
           // @TODO return meaningful information
@@ -65,21 +60,26 @@ class GovreadyAgent {
     $modules = system_rebuild_module_data();
 
     foreach ($modules as $key => $module) {
+      
       // Make sure not hidden, testing, core, or submodule.
-      if (!(!empty($module->info['hidden']) && $module->info['hidden'] == 1)
-        && !(!empty($module->info['package']) && $module->info['package'] === 'Testing')
-        && $module->info['project'] !== 'drupal'
-        && $module->info['project'] === $key
-      ) {
+      $output_module = !(!empty($module->info['hidden']) && $module->info['hidden'] == 1)
+                    && !(!empty($module->info['package']) && $module->info['package'] === 'Testing')
+                    && !(!empty($module->info['package']) && $module->info['package'] === 'Core')
+                    &&  (empty($module->info['project']) || empty($out[$module->info['project']]));
+
+      if ($output_module) {
         // print_r($module);
-        array_push($out, array(
+        $out_key = !empty($module->info['project']) ? $module->info['project'] : $module->name;
+        $out[$out_key] = array(
           'label' => $module->info['name'],
           'namespace' => $key,
           'status' => (boolean) $module->status,
           'version' => $module->info['version'],
           'project_link' => !empty($module->info['project']) ? 'https://www.drupal.org/project/' . $module->info['project'] : '',
-        ));
+        );
+
       } //if
+
     } //foreach
 
     return array('plugins' => $out, 'forceDelete' => TRUE);
@@ -97,14 +97,14 @@ class GovreadyAgent {
     foreach ($users as $key => $user) {
       if ($key > 0) {
         array_push($out, array(
-          'userId' => $account->uid,
-          'username' => $account->name,
-          'email' => $account->mail,
-          'name' => $account->name,
-          'created' => $account->created,
-          'roles' => array_values($account->roles),
-          'superAdmin' => user_access('administer site configuration', $account),
-          'lastLogin' => $account->login,
+          'userId' => $user->uid,
+          'username' => $user->name,
+          'email' => $user->mail,
+          'name' => $user->name,
+          'created' => $user->created,
+          'roles' => array_values($user->roles),
+          'superAdmin' => user_access('administer site configuration', $user),
+          'lastLogin' => $user->login,
         ));
       }
 
