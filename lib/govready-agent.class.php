@@ -82,7 +82,7 @@ class GovreadyAgent {
 
     } //foreach
 
-    return array('plugins' => $out, 'forceDelete' => TRUE);
+    return array('plugins' => array_values($out), 'forceDelete' => TRUE);
 
   }
 
