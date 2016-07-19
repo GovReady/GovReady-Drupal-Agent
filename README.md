@@ -10,6 +10,8 @@ on production websites.**
 The GovReady Agent monitors your Drupal site, domain, and ssl certificate to
 ensure that you are following current security best-practices.
 
+(View online demo >)[http://drupal.govready.albatrossdemos.com/]
+
 The GovReady Dashboard gives you a shared, easy-to-digest overview of the status
 of security on your website, including:
 * Drupal Core update status
