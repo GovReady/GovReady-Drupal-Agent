@@ -56,6 +56,11 @@ function govready_drush_command() {
     'description' => 'Reset your GovReady site.',
   );
 
+  $items['govready-demo-load'] = array(
+    'description' => 'Existing Measures, Submissions, and Contacts will be deleted and replaced with demo data.',
+  );
+
+
   return $items;
 }
 
@@ -92,12 +97,18 @@ function drush_govready_collect($type = FALSE) {
   foreach ($endpoints as $item) {
 
     // Do a little rewriting of Drupal-friendly labels to the GovReady API endpoints
+    $prefix = 'sites';
     $item = ($item == 'modules') ? 'plugins' : $item;
-    $item = ($item == 'domain') ? 'ping' : $item;
+    
 
     // Call the appropriate function to collect data in govready-agent.class.php
-    $data = call_user_func(array($agent, $item));
-    $endpoint = '/sites/' . $options['siteId'] . '/' . $item;
+    if ($item == 'domain') {
+      $endpoint = '/monitor/' . $options['siteId'] . '/domain';
+    }
+    else {
+      $data = call_user_func(array($agent, $item));
+      $endpoint = '/users/' . $options['siteId'] . '/' . $item;
+    }
     $return = govready_api($endpoint, 'POST', $data);
 
     // @todo: debug flag?
@@ -218,6 +229,33 @@ function drush_govready_reset() {
     drush_user_abort();
   }
 
+}
+
+
+/**
+ * Callback for the govready-mode command
+ */
+function drush_govready_demo_load() {
+
+  // Check that GovReady has been initialized
+  $options = variable_get('govready_options', array());
+  if (empty($options['siteId'])) {
+    return drush_set_error(dt('The GovReady module has not been initialized. Run "drush govready-init".'));
+  }
+
+  if (drush_confirm('Are you sure you want to import demo data?  Existing Measures, Submissions, and Contacts will be deleted.')) {
+    
+    // Update Measures, Submissions, and Contacts
+    $endpoint = '/sites/' . $options['siteId'] .'/load/demo';
+    print_r(govready_api($endpoint, 'POST'));
+
+    // Update agent data
+    drush_govready_collect('all');
+    drush_govready_collect('domain');
+  }
+  else {
+    drush_user_abort();
+  }
 
 }
 

@@ -2,7 +2,7 @@
 
 ## Overview
 The GovReady module comes with a number of drush commands to help automate and
-script communication with the GovReady API
+script communication with the GovReady API:
 
 ```
  govready-collect      Push data to the GovReady API.                 
@@ -73,3 +73,9 @@ Aliases: govready-init
 ```
 Reset your GovReady site.
 ```
+
+## govready-demo-load
+```
+Existing Measures, Submissions, and Contacts will be deleted and replaced with demo data.
+```
+
