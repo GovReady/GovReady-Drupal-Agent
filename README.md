@@ -38,6 +38,10 @@ Currently, we do not recommend installing this module on production websites.
 4. Go to `/admin/reports/govready`, create a GovReady account and proceed
    through the module auto-activation steps.
 
+
+## More documentation
+See the markdown files in docs for further documentation.
+
 ---
  
 ## Developing
