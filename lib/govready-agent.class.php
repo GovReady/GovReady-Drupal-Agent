@@ -52,7 +52,7 @@ class GovreadyAgent {
   /**
    * Callback for /govready/trigger, key=plugins.
    */
-  private function plugins() {
+  public function plugins() {
     $out = array();
 
     // Hint to use system_rebuild_module_data() came from
@@ -88,7 +88,7 @@ class GovreadyAgent {
   /**
    * Callback for ?action=govready_v1_trigger&key=accounts.
    */
-  private function accounts() {
+  public function accounts() {
     $out = array();
 
     $users = entity_load('user');
@@ -116,7 +116,7 @@ class GovreadyAgent {
   /**
    * Callback for ?action=govready_v1_trigger&key=stack.
    */
-  private function stack() {
+  public function stack() {
 
     $stack = array(
       'os' => php_uname('s') . ' ' . php_uname('r'),
