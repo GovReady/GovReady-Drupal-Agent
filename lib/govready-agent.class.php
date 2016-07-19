@@ -50,7 +50,7 @@ class GovreadyAgent {
   }
 
   /**
-   * Callback for ?action=govready_v1_trigger&key=plugins.
+   * Callback for /govready/trigger, key=plugins.
    */
   private function plugins() {
     $out = array();
@@ -68,7 +68,6 @@ class GovreadyAgent {
                     &&  (empty($module->info['project']) || empty($out[$module->info['project']]));
 
       if ($output_module) {
-        // print_r($module);
         $out_key = !empty($module->info['project']) ? $module->info['project'] : $module->name;
         $out[$out_key] = array(
           'label' => $module->info['name'],
