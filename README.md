@@ -40,7 +40,10 @@ Currently, we do not recommend installing this module on production websites.
 
 
 ## More documentation
-See the markdown files in docs for further documentation.
+See the markdown files in docs for further documentation:
+* [Drush and the GovReady Dashboard](https://github.com/GovReady/GovReady-Drupal-Agent/blob/7.x-1.x-dev/docs/drush.md)
+* [GovReady API Security](https://github.com/GovReady/GovReady-CMS-API/wiki/Security)
+* [Running the GovReady API locally or on an intranet](https://github.com/GovReady/GovReady-CMS-API/wiki/Running-the-GovReady-API-locally-or-on-an-intranet)
 
 ---
  
