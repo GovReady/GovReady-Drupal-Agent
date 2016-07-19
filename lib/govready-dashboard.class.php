@@ -42,6 +42,7 @@ class GovreadyDashboard {
       if (empty($options['siteId'])) {
         $data = array(
           'url' => $base_url,
+          'application' => 'drupal',
         );
         $response = govready_api('/initialize', 'POST', $data, TRUE);
         $options['siteId'] = $response['_id'];
