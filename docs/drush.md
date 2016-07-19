@@ -4,6 +4,7 @@
 The GovReady module comes with a number of drush commands to help automate and
 script communication with the GovReady API
 
+```
  govready-collect      Push data to the GovReady API.                 
  (govready)                                                           
  govready-scan         Push scan results to the GovReady API.         
@@ -12,6 +13,8 @@ script communication with the GovReady API
  govready-initialize   Set the GovReady API mode.                     
  (govready-init)   
  govready-reset        Reset your GovReady site.                      
+```
+
 
 ## govready-collect (govready)
 ```
