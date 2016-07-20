@@ -13,7 +13,7 @@ class CmsVulnerabilitiesWidget extends Component {
   coreSection (core) {
     if(this.coreVulnerabilty(core)) {
       return (
-        <div className="alert alert-success">{this.props.cms} core is up-to-date</div>
+        <div className="alert alert-success">No {this.props.cms} core vulnerabilities.</div>
       )
     }
     else {
