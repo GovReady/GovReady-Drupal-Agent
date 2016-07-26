@@ -9,17 +9,17 @@ class PluginsPage extends Component {
   render () {
     let {header, pluginText, cmsUrl, updates, core, cms, plugins} = this.props;
     // core update alert
-    const coreUpdate = (vulnerabilities = []) => {
+    const coreUpdate = () => {
       // No update
       if(!core.updates) {
         return '';
       }
       // Has security vulnerabilities
-      if(vulnerabilities.length) {
+      if(core.vulnerabilities.length) {
         return (
           <Panel className='panel panel-danger' header={cms + ' Core security update!'} eventKey="0">
-            {vulnerabilities.map((vulnerability, index) => (
-              <Vulnerability data={vulnerability} key={index} />
+            {core.vulnerabilities.map((vulnerability, index) => (
+              <Vulnerability data={vulnerability} version={core.version} key={index} />
             ))}
           </Panel>
         )
