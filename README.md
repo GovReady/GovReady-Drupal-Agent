@@ -24,6 +24,8 @@ of security on your website, including:
 * Accounts that have not recently logged-in (and may have left your
   organization)
 
+![screenshot of GovReady Drupal dashboard](https://raw.githubusercontent.com/GovReady/GovReady-Drupal-Agent/7.x-1.x-dev/images/screenshot.png)
+
 ## Requirements
 * cURL must be installed and appear in `php.ini`. 
 [Tutorial to enable cURL in PHP]
