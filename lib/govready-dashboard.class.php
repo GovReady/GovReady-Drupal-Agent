@@ -33,6 +33,18 @@ class GovreadyDashboard {
       'trigger_endpoint' => url('govready/trigger'),
     );
 
+    // Add warning message if overlay is enabled.
+    if (module_exists('overlay')) {
+      $url = url('admin/reports/govready');
+      drupal_set_message(
+        t(
+          'The GovReady Dashboard may not work properly with the Overlay module enabled. To use the Dashboard, please disable the Overlay module on the !modules, or view the dashboard from a !tab outside of the overlay.', array(
+            '!modules' => l('modules page', 'admin/modules'), 
+            '!tab' => l('new tab', $url, array('attributes' => array('onclick' => 'window.open("'.$url.'");return false;')))
+          )
+        ), 'warning');
+    }
+
     // First time using app, need to set everything up.
     if (empty($options['refresh_token'])) {
 
