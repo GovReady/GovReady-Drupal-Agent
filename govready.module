@@ -5,6 +5,8 @@
  * Code for the GovReady module.
  */
 
+define('GOVREADY_KEY', 'govready');
+
 /**
  * GovReady configuration settings.
  */
@@ -12,6 +14,7 @@ function govready_config() {
 
   return array(
     'api_debug' => FALSE,
+    'key' => 'govready',
     'auth0' => array(
       'domain' => 'govready.auth0.com',
       'client_id' => 'HbYZO5QXKfgNshjKlhZGizskiaJH9kGH',
@@ -97,10 +100,19 @@ function govready_dashboard_callback() {
  */
 function govready_trigger_callback() {
 
+  govready_validate_token();
+
   module_load_include('class.php', 'govready', 'lib/govready-agent');
   $agent = new GovreadyAgent();
   return $agent->ping();
 
+}
+
+function govready_validate_token() {
+  if(!isset( $_REQUEST[ "govready_nonce" ] ) || !drupal_valid_token($_REQUEST[ "govready_nonce" ], GOVREADY_KEY)) {
+    echo "-1";
+    drupal_exit();
+  }
 }
 
 /**
@@ -159,6 +171,8 @@ function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = 
  */
 function govready_refresh_token($return = FALSE) {
 
+  govready_validate_token();
+
   // @todo: nonce this call
   $options = variable_get('govready_options');
   if (!empty($_REQUEST['refresh_token']) && $_REQUEST['refresh_token']) {
@@ -187,6 +201,8 @@ function govready_refresh_token($return = FALSE) {
  * Call the GovReady API.
  */
 function govready_api_proxy() {
+
+  govready_validate_token();
 
   $method = !empty($_REQUEST['method']) ? $_REQUEST['method'] : $_SERVER['REQUEST_METHOD'];
   $response = govready_api($_REQUEST['endpoint'], $method, $_REQUEST);
