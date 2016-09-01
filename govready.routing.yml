@@ -1,0 +1,28 @@
+govready.dashboard:
+  pattern: '/admin/reports/govready'
+  defaults:
+    _controller: '\Drupal\govready\Controller\GovReadyController::govready_dashboard'
+    _title: 'GovReady Dashboard'
+  requirements:
+    _permission: 'view govready'
+
+govready.api_proxy:
+  pattern: '/govready/api'
+  defaults:
+    _controller: '\Drupal\govready\Controller\GovReadyController::govready_api_proxy'
+  requirements:
+    _permission: 'view govready'
+
+govready.refresh_token:
+  pattern: '/govready/refresh-token'
+  defaults:
+    _controller: '\Drupal\govready\Controller\GovReadyController::govready_refresh_token'
+  requirements:
+    _permission: 'view govready'
+
+govready.trigger_callback:
+  pattern: '/govready/trigger'
+  defaults:
+    _controller: '\Drupal\govready\Controller\GovReadyController::govready_trigger_callback'
+  requirements:
+    _permission: 'view govready'
