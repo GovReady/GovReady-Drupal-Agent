@@ -64,7 +64,7 @@ class GovreadyDashboard {
       // Save some JS variables (available at govready.siteId, etc)
       drupal_add_js($path . 'govready-connect.js');
       $settings = array_merge(array(
-        // 'nonce' => wp_create_nonce( $this->key ),.
+        'govready_nonce' => drupal_get_token(GOVREADY_KEY),
         'auth0' => $this->config['auth0'],
         'siteId' => $options['siteId'],
       ), $settings);
@@ -81,6 +81,7 @@ class GovreadyDashboard {
 
       // Save some JS variables (available at govready.siteId, etc)
       $settings = array_merge(array(
+        'govready_nonce' => drupal_get_token(GOVREADY_KEY),
         'siteId' => !is_null($options['siteId']) ? $options['siteId'] : NULL,
         'mode' => !empty($options['mode']) ? $options['mode'] : 'remote',
         // @todo: 'nonce' => wp_create_nonce( $this->key )

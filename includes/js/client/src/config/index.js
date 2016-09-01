@@ -23,8 +23,8 @@ else if(window.Drupal && window.Drupal.settings.govready) {
   let url = '/govready/api?';
   config.apiTrigger = '/govready/trigger?endpoint=/sites/' + config.siteId + '/';
   if(process.env.NODE_ENV === 'development') {
-    url = 'http://alex-UX303UA:32777/govready/api?';
-    config.apiTrigger = 'http://localhost:32777/govready/trigger?endpoint=/sites/' + config.siteId + '/';
+    url = 'http://172.17.0.4/govready/api?';
+    config.apiTrigger = 'http://172.17.0.4/govready/trigger?endpoint=/sites/' + config.siteId + '/';
   }
   config.apiUrl = url + 'action=govready_proxy&endpoint=/sites/' + config.siteId + '/';
   config.apiUrlNoSite = url + 'action=govready_proxy&endpoint=';
@@ -36,5 +36,9 @@ else {
 
 // Date format
 config.dateFormat = 'MMMM Do YYYY';
+
+export function updateNonce(nonce) {
+  config.govready_nonce = none;
+}
 
 export default config;

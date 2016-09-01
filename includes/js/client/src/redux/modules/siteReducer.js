@@ -1,6 +1,10 @@
 import objectAssign from 'object-assign';
 import { hashHistory } from 'react-router';
+import apiHelper from './apiHelper';
+import { Promise as BPromise } from 'bluebird';
 import config from 'config';
+
+// var BPromise = require('bluebird');
 
 // ------------------------------------
 // Constants
@@ -129,13 +133,6 @@ export function siteLoaded (mode: string): Action {
 // Calls endpoint
 export function sitePost (url: string, appendUrl: boolean, data: object, method: string): Function {
   return (dispatch: Function) => {
-    // Build post data
-    let form_data = new FormData();
-    if(Object.keys(data).length) { 
-      for(let key of Object.keys(data)) {
-        form_data.append(key, data[key]);
-      }
-    }
     // Add normal path? (trigger has seperate url)
     if(appendUrl) {
       url = config.apiUrlNoSite + url;
@@ -145,26 +142,11 @@ export function sitePost (url: string, appendUrl: boolean, data: object, method:
       url = url + '&method=' + method;
     }
     // Load data
-    return fetch(url, {
-      method: 'post',
-      credentials: 'same-origin',
-      body: form_data
-    }).then((response: object) => {
-      // Good?
-      if (response.status >= 200 && response.status < 300) {
-        return response.json();
-        // @TODO handle Error
-      } else {
-        let error = new Error(response.statusText);
-        error.response = response;
-        error.error = response.statusText;
-        return error;
-      }
+    return fetch(url, apiHelper.requestParams('post', data)).then((response: object) => {
+      return apiHelper.responseCheck(response);
     }).then((json: object) => {
-      // Some error
-      if(json.error || json.err || json === 'err: unknown') {
-        let error = new Error();
-        error.error = json;
+      const error = apiHelper.jsonCheck(json);
+      if(error) {
         return error;
       }
       return json;
@@ -197,7 +179,7 @@ export function sitePre( mode: string = config.mode ): Function {
           } else {
             allSet = false;
           }
-        })
+        });
         if(allSet || forceDispatch) {
           dispatch(siteLoaded(config.mode ? config.mode : 'remote'));
           return;
@@ -314,12 +296,12 @@ export function siteAggAll(): Function {
         }
       },
       {
-        url:  '/monitor/' + config.siteId + '/domain',
+        url: '/monitor/' + config.siteId + '/stack',
         data: {},
         appendUrl: true
       },
       {
-        url: '/monitor/' + config.siteId + '/plugins',
+        url:  '/monitor/' + config.siteId + '/domain',
         data: {},
         appendUrl: true
       },
@@ -329,16 +311,15 @@ export function siteAggAll(): Function {
         appendUrl: true
       },
       {
-        url: '/monitor/' + config.siteId + '/stack',
+        url: '/monitor/' + config.siteId + '/plugins',
         data: {},
         appendUrl: true
       },
-      
     ];
     dispatch(siteAggStart());
-    return Promise.all(calls.map((call) => {
+    return BPromise.each(calls, (call) => {
       return dispatch(sitePost(call.url, call.appendUrl, call.data, call.method));
-    })).then((returns) => {
+    }).then((returns) => {
       let error;
       // Agg results for errors
       returns.map((returnItem) => {
@@ -378,8 +359,8 @@ export function siteLocalAggAll(): Function {
       {
         url: config.apiTrigger,
         data: {
-          key: 'plugins',
-          endpoint: 'plugins',
+          key: 'stack',
+          endpoint: 'stack',
           siteId: config.siteId
         }
       },
@@ -394,17 +375,16 @@ export function siteLocalAggAll(): Function {
       {
         url: config.apiTrigger,
         data: {
-          key: 'stack',
-          endpoint: 'stack',
+          key: 'plugins',
+          endpoint: 'plugins',
           siteId: config.siteId
         }
       },
-      
     ];
     dispatch(siteLocalAggStart());
-    return Promise.all(calls.map((call) => {
+    return BPromise.each(calls, (call) => {
       return dispatch(sitePost(call.url, call.appendUrl, call.data, call.method));
-    })).then((returns) => {
+    }).then((returns) => {
       let error;
       // Agg results for errors
       returns.map((returnItem) => {
