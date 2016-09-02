@@ -3,8 +3,11 @@
  */
 
 (function($, Drupal) {
-  Drupal.behaviors.angular_311 = {
+  Drupal.behaviors.govready_connect = {
     attach: function(context, settings) {
+
+  console.log(settings);
+
 
   var domain = settings.govready_connect.auth0.domain;
   var clientID = settings.govready_connect.auth0.client_id;

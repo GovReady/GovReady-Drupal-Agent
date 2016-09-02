@@ -5,11 +5,8 @@
  * Collects data and sends it to the GovReady API.
  */
 
-/**
- * GovreadyAgent class.
- *
- * Namespace Govready\GovreadyAgent.
- */
+namespace Drupal\govready\Controller;
+
 class GovreadyAgent {
 
   /**
@@ -22,7 +19,7 @@ class GovreadyAgent {
    */
   public function ping() {
     // print_r($_POST);
-    $options = variable_get('govready_options');
+    $options = \Drupal::config('govready.settings')->get('govready_options');
     // @todo: check that request is coming from plugin.govready.com, or is properly nonced (for manual refreshes)
     if ($_POST['siteId'] == $options['siteId']) {
 
@@ -34,7 +31,7 @@ class GovreadyAgent {
           if (!empty($_POST['endpoint'])) {
             // print_r($data);
             $endpoint = '/sites/' . $options['siteId'] . '/' . $_POST['endpoint'];
-            $return = govready_api($endpoint, 'POST', $data);
+            $return = \Drupal\govready\Controller\GovreadyPage::govready_api($endpoint, 'POST', $data);
             // drupal_json_output($data);
             // print_r($return);
           }
@@ -138,9 +135,11 @@ class GovreadyAgent {
    */
   private function changeMode() {
 
-    $options = variable_get('govready_options', array());
+    $options = \Drupal::config('govready.settings')->get('govready_options');
     $options['mode'] = $_POST['mode'];
-    variable_set('govready_options', $options);
+    \Drupal::configFactory()->getEditable('govready.settings')
+      ->set('govready_options', $options)
+      ->save();
 
     return array('mode' => $options['mode']);
 

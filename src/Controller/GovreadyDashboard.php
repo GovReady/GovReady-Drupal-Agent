@@ -5,11 +5,8 @@
  * Displays the GovReady Dashboard.
  */
 
-/**
- * GovreadyDashboard class.
- *
- * Namespace Govready\GovreadyDashboard.
- */
+namespace Drupal\govready\Controller;
+
 class GovreadyDashboard {
 
   /**
@@ -24,26 +21,19 @@ class GovreadyDashboard {
    * Display the GovReady dashboard.
    */
   public function dashboardPage() {
-    $options = variable_get('govready_options', array());
+    $options = \Drupal::config('govready.settings')->get('govready_options');
+    $token_generator = \Drupal::csrfToken();
 
     $path = $this->path . '/includes/js/';
     $settings = array(
-      'api_endpoint' => url('govready/api'),
-      'token_endpoint' => url('govready/refresh-token'),
-      'trigger_endpoint' => url('govready/trigger'),
+      // @todo: change
+      //'api_endpoint' => \Drupal::url('/govready/api'),
+      //'token_endpoint' => \Drupal::url('/govready/refresh-token'),
+      //'trigger_endpoint' => \Drupal::url('/govready/trigger'),
+      'api_endpoint' => '/govready/api',
+      'token_endpoint' => '/govready/refresh-token',
+      'trigger_endpoint' => '/govready/trigger',
     );
-
-    // Add warning message if overlay is enabled.
-    if (module_exists('overlay')) {
-      $url = url('admin/reports/govready');
-      drupal_set_message(
-        t(
-          'The GovReady Dashboard may not work properly with the Overlay module enabled. To use the Dashboard, please disable the Overlay module on the !modules, or view the dashboard from a !tab outside of the overlay.', array(
-            '!modules' => l('modules page', 'admin/modules'), 
-            '!tab' => l('new tab', $url, array('attributes' => array('onclick' => 'window.open("'.$url.'");return false;')))
-          )
-        ), 'warning');
-    }
 
     // First time using app, need to set everything up.
     if (empty($options['refresh_token'])) {
@@ -56,21 +46,31 @@ class GovreadyDashboard {
           'url' => $base_url,
           'application' => 'drupal',
         );
-        $response = govready_api('/initialize', 'POST', $data, TRUE);
+        $response = \Drupal\govready\Controller\GovreadyPage::govready_api('/initialize', 'POST', $data, TRUE);
         $options['siteId'] = $response['_id'];
-        variable_set('govready_options', $options);
+        \Drupal::configFactory()->getEditable('govready.settings')
+          ->set('govready_options', $options)
+          ->save();
       }
 
       // Save some JS variables (available at govready.siteId, etc)
-      drupal_add_js($path . 'govready-connect.js');
+      //drupal_add_js($path . 'govready-connect.js');
       $settings = array_merge(array(
-        'govready_nonce' => drupal_get_token(GOVREADY_KEY),
+        'govready_nonce' => $token_generator->get(),
         'auth0' => $this->config['auth0'],
         'siteId' => $options['siteId'],
       ), $settings);
-      drupal_add_js(array('govready_connect' => $settings), 'setting');
+      //drupal_add_js(array('govready_connect' => $settings), 'setting');
 
-      return theme('govready_connect');
+      //return theme('govready_connect');
+      $build = array();
+      $build['#theme'] = 'govready_connect';
+      $build['#attached']['library'][] = 'govready/govready-connect';
+      $build['#attached']['drupalSettings']['govready_connect'] = $settings;
+
+      dpm($build);
+
+      return $build;
 
     }
 
@@ -81,16 +81,16 @@ class GovreadyDashboard {
 
       // Save some JS variables (available at govready.siteId, etc)
       $settings = array_merge(array(
-        'govready_nonce' => drupal_get_token(GOVREADY_KEY),
+        'govready_nonce' => $token_generator->get(),
         'siteId' => !is_null($options['siteId']) ? $options['siteId'] : NULL,
         'mode' => !empty($options['mode']) ? $options['mode'] : 'remote',
         // @todo: 'nonce' => wp_create_nonce( $this->key )
         'connectUrl' => $config['govready_url'],
       ), $settings);
-      drupal_add_js(array('govready' => $settings), 'setting');
+      //drupal_add_js(array('govready' => $settings), 'setting');
 
       // Enqueue react.
-      drupal_add_js($path . 'client/dist/vendor.dist.js', array(
+      /*drupal_add_js($path . 'client/dist/vendor.dist.js', array(
         'scope' => 'footer',
         'group' => 'GovReady',
         'weight' => 1,
@@ -100,9 +100,19 @@ class GovreadyDashboard {
         'group' => 'GovReady',
         'weight' => 2,
       ));
-      drupal_add_css($path . 'client/dist/app.dist.css');
+      drupal_add_css($path . 'client/dist/app.dist.css');*/
 
-      return theme('govready_dashboard');
+      // Assemble the markup.
+      $build = array();
+      $build['#theme'] = 'govready_dashboard';
+      $build['#attached']['library'][] = 'govready/govready-dashboard';
+      $build['#attached']['drupalSettings']['govready'] = $settings;
+
+      return $build;
+
+      
+
+      //return theme('govready_dashboard');
 
     } // if()
 

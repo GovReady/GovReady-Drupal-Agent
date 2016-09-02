@@ -81,7 +81,7 @@ function drush_govready_collect($type = FALSE) {
   }
 
   // Check that GovReady has been initialized
-  $options = variable_get('govready_options', array());
+  $options = \Drupal::config('govready.settings')->get('govready_options');
   if (empty($options['siteId'])) {
     return drush_set_error(dt('The GovReady module has not been initialized. Run "drush govready-init".'));
   }
@@ -126,7 +126,7 @@ function drush_govready_collect($type = FALSE) {
 function drush_govready_scan($name = FALSE) {
 
   // Check that GovReady has been initialized
-  $options = variable_get('govready_options', array());
+  $options = \Drupal::config('govready.settings')->get('govready_options');
   if (empty($options['siteId'])) {
     return drush_set_error(dt('The GovReady module has not been initialized. Run "drush govready-init".'));
   }
@@ -162,7 +162,7 @@ function drush_govready_mode($mode = FALSE) {
   }
 
   // Check that GovReady has been initialized
-  $options = variable_get('govready_options', array());
+  $options = \Drupal::config('govready.settings')->get('govready_options');
   if (empty($options['siteId'])) {
     return drush_set_error(dt('The GovReady module has not been initialized. Run "drush govready-init".'));
   }
@@ -179,7 +179,7 @@ function drush_govready_mode($mode = FALSE) {
 function drush_govready_initialize($mode = FALSE) {
 
   // Check that GovReady has been initialized
-  $options = variable_get('govready_options', array());
+  $options = \Drupal::config('govready.settings')->get('govready_options');
   if (!empty($options['siteId'])) {
     return drush_set_error(dt('The GovReady module has already been initialized.'));
   }
@@ -195,7 +195,7 @@ function drush_govready_initialize($mode = FALSE) {
 function drush_govready_site() {
 
   // Check that GovReady has been initialized
-  $options = variable_get('govready_options', array());
+  $options = \Drupal::config('govready.settings')->get('govready_options');
   if (empty($options['siteId'])) {
     return drush_set_error(dt('The GovReady module has not been initialized. Run "drush govready-init".'));
   }
@@ -213,17 +213,20 @@ function drush_govready_site() {
 function drush_govready_reset() {
 
   // Check that GovReady has been initialized
-  $options = variable_get('govready_options', array());
+  $options = \Drupal::config('govready.settings')->get('govready_options');
   if (empty($options['siteId'])) {
     return drush_set_error(dt('The GovReady module has not been initialized. Run "drush govready-init".'));
   }
 
   if (drush_confirm('Are you sure you want to delete your site? This will delete all data that you have pushed to the GovReady API, including contacts, submissions, and scans.')) {
     $endpoint = '/sites/' . $options['siteId'];
-    print_r(govready_api($endpoint, 'DELETE'));
+    //print_r(govready_api($endpoint, 'DELETE'));
 
-    variable_set('govready_options', NULL);
-    variable_set('govready_token', NULL);
+    \Drupal::configFactory()->getEditable('govready.settings')
+      ->set('govready_options', NULL)
+      ->set('govready_token', NULL)
+      ->save();
+
   }
   else {
     drush_user_abort();
@@ -238,7 +241,7 @@ function drush_govready_reset() {
 function drush_govready_demo_load() {
 
   // Check that GovReady has been initialized
-  $options = variable_get('govready_options', array());
+  $options = \Drupal::config('govready.settings')->get('govready_options');
   if (empty($options['siteId'])) {
     return drush_set_error(dt('The GovReady module has not been initialized. Run "drush govready-init".'));
   }

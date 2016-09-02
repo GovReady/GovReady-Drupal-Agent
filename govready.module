@@ -4,3 +4,45 @@
  * @file
  * GovReady Dashboard.
  */
+
+/**
+ * GovReady configuration settings.
+ */
+function govready_config() {
+
+  return array(
+    'api_debug' => FALSE,
+    'auth0' => array(
+      'domain' => 'govready.auth0.com',
+      'client_id' => 'HbYZO5QXKfgNshjKlhZGizskiaJH9kGH',
+    ),
+    'commercial' => FALSE,
+    'govready_url' => 'https://plugin.govready.com/v1.0',
+  );
+
+}
+
+
+  /**
+   * Implements hook_theme().
+   */
+  function govready_theme() {
+
+    $path = drupal_get_path('module', 'govready');
+    $variables = array(
+      'logo' => '/' . $path . '/images/logo.png', // @todo: \Drupal::url('/' . $path . '/images/logo.png'),
+      'path' => '',
+    );
+
+    return array(
+      'govready_connect' => array(
+        'template' => 'govready-connect',
+        'variables' => $variables,
+      ),
+      'govready_dashboard' => array(
+        'template' => 'govready-dashboard',
+        'variables' => $variables,
+      ),
+    );
+
+  }

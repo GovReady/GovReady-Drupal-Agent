@@ -8,36 +8,20 @@
 namespace Drupal\govready\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Provides route responses for the Example module.
  */
-class GovReadyController extends ControllerBase {
-
-  /**
-   * GovReady configuration settings.
-   */
-  public function govready_config() {
-
-    return array(
-      'api_debug' => FALSE,
-      'auth0' => array(
-        'domain' => 'govready.auth0.com',
-        'client_id' => 'HbYZO5QXKfgNshjKlhZGizskiaJH9kGH',
-      ),
-      'commercial' => FALSE,
-      'govready_url' => 'https://plugin.govready.com/v1.0',
-    );
-
-  }
+class GovreadyPage extends ControllerBase {
 
   /**
    * Page callback for the GovReady Dashboard.
    */
   public function govready_dashboard() {
 
-    module_load_include('class.php', 'govready', 'lib/govready-dashboard');
-    $dashboard = new GovreadyDashboard();
+    //module_load_include('class.php', 'govready', 'lib/govready-dashboard');
+    $dashboard = new \Drupal\govready\Controller\GovreadyDashboard();
     return $dashboard->dashboardPage();
 
   }
@@ -47,8 +31,8 @@ class GovReadyController extends ControllerBase {
    */
   public function govready_trigger_callback() {
 
-    module_load_include('class.php', 'govready', 'lib/govready-agent');
-    $agent = new GovreadyAgent();
+    //module_load_include('class.php', 'govready', 'lib/govready-agent');
+    $agent = new \Drupal\govready\Controller\GovreadyAgent();
     return $agent->ping();
 
   }
@@ -62,7 +46,7 @@ class GovReadyController extends ControllerBase {
     $url = $config['govready_url'] . $endpoint;
 
     // Make sure our token is a-ok.
-    $token = variable_get('govready_token', array());
+    $token = \Drupal::config('govready.settings')->get('govready_token');
 
     if (!$anonymous && (empty($token['id_token']) || empty($token['endoflife']) || $token['endoflife'] < time())) {
       $token = govready_refresh_token(TRUE);
@@ -110,25 +94,29 @@ class GovReadyController extends ControllerBase {
   public function govready_refresh_token($return = FALSE) {
 
     // @todo: nonce this call
-    $options = variable_get('govready_options');
+    $options = \Drupal::config('govready.settings')->get('govready_options');
     if (!empty($_REQUEST['refresh_token']) && $_REQUEST['refresh_token']) {
       $token = $_REQUEST['refresh_token'];
       $options['refresh_token'] = $token;
-      variable_set('govready_options', $options);
+      \Drupal::configFactory()->getEditable('govready.settings')
+        ->set('govready_options', $options)
+        ->save();
     }
     else {
       $token = !empty($options['refresh_token']) ? $options['refresh_token'] : '';
     }
 
-    $response = govready_api('/refresh-token', 'POST', array('refresh_token' => $token), TRUE);
+    $response = $this->govready_api('/refresh-token', 'POST', array('refresh_token' => $token), TRUE);
     $response['endoflife'] = time() + (int) $response['expires_in'];
-    variable_set('govready_token', $response);
+    \Drupal::configFactory()->getEditable('govready.settings')
+        ->set('govready_token', $response)
+        ->save();
 
     if ($return) {
       return $response;
     }
     else {
-      drupal_json_output($response);
+      return new JsonResponse($response);
     }
 
   }
@@ -140,33 +128,8 @@ class GovReadyController extends ControllerBase {
 
     $method = !empty($_REQUEST['method']) ? $_REQUEST['method'] : $_SERVER['REQUEST_METHOD'];
     $response = govready_api($_REQUEST['endpoint'], $method, $_REQUEST);
-    drupal_json_output($response);
+    return new JsonResponse($response);
 
   }
-
-  /**
-   * Implements hook_theme().
-   */
-  function govready_theme() {
-
-    $path = drupal_get_path('module', 'govready');
-    $variables = array(
-      'logo' => url($path . '/images/logo.png'),
-      'path' => '',
-    );
-
-    return array(
-      'govready_connect' => array(
-        'template' => 'templates/govready-connect',
-        'variables' => $variables,
-      ),
-      'govready_dashboard' => array(
-        'template' => 'templates/govready-dashboard',
-        'variables' => $variables,
-      ),
-    );
-
-  }
-
 
 }
