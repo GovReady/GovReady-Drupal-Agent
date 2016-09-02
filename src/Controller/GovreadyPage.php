@@ -127,7 +127,7 @@ class GovreadyPage extends ControllerBase {
   public function govready_api_proxy() {
 
     $method = !empty($_REQUEST['method']) ? $_REQUEST['method'] : $_SERVER['REQUEST_METHOD'];
-    $response = govready_api($_REQUEST['endpoint'], $method, $_REQUEST);
+    $response = $this->govready_api($_REQUEST['endpoint'], $method, $_REQUEST);
     return new JsonResponse($response);
 
   }

@@ -32,6 +32,7 @@ function govready_config() {
     $variables = array(
       'logo' => '/' . $path . '/images/logo.png', // @todo: \Drupal::url('/' . $path . '/images/logo.png'),
       'path' => '',
+      'js_settings' => array(),
     );
 
     return array(

@@ -106,7 +106,10 @@ class GovreadyDashboard {
       $build = array();
       $build['#theme'] = 'govready_dashboard';
       $build['#attached']['library'][] = 'govready/govready-dashboard';
-      $build['#attached']['drupalSettings']['govready'] = $settings;
+      
+      // @todo: We are using a hacky D7-esque Drupal.settings injection instead of what we should be using:
+      //$build['#attached']['drupalSettings']['govready'] = $settings;
+      $build['#js_settings'] = 'var d8GovreadySettings = ' . json_encode($settings);   
 
       return $build;
 

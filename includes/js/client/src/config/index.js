@@ -15,8 +15,9 @@ if(window.govready) {
   config.apiTrigger = url + 'action=govready_v1_trigger';
   config.pluginUrl = 'https://wordpress.org/plugins/';
 }
-else if(window.Drupal && window.Drupal.settings.govready) {
-  config = window.Drupal.settings.govready;
+else if(d8GovreadySettings || (window.Drupal && window.Drupal.settings.govready)) {
+  config = d8GovreadySettings ? d8GovreadySettings : window.Drupal.settings.govready;
+  console.log(config);
   config.cms = 'drupal';
   config.pluginText = 'Module';
   config.cmsNice = 'Drupal';
