@@ -38,57 +38,6 @@ class GovreadyPage extends ControllerBase {
   }
 
   /**
-   * Make a request to the GovReady API.
-   */
-  public function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = FALSE) {
-
-    $config = govready_config();
-    $url = $config['govready_url'] . $endpoint;
-
-    // Make sure our token is a-ok.
-    $token = \Drupal::config('govready.settings')->get('govready_token');
-
-    if (!$anonymous && (empty($token['id_token']) || empty($token['endoflife']) || $token['endoflife'] < time())) {
-      $token = govready_refresh_token(TRUE);
-    }
-    $token = !$anonymous && !empty($token['id_token']) ? $token['id_token'] : FALSE;
-
-    // Make the API request with cURL.
-    // @todo should we support HTTP_request (https://pear.php.net/manual/en/package.http.http-request.intro.php)?
-    $headers = array('Content-Type: application/json');
-    if ($token) {
-      array_push($headers, 'Authorization: Bearer ' . $token);
-    }
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-    if ($data) {
-      curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-    }
-    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-
-    // Only for debugging.
-    if (!empty($config['api_debug']) && $config['api_debug']) {
-      print_r($url);
-    }
-
-    $response = curl_exec($curl);
-    curl_close($curl);
-
-    // Only for debugging.
-    if (!empty($config['api_debug']) && $config['api_debug']) {
-      print_r($data);
-      print_r($response);
-    }
-
-    $response = json_decode($response, TRUE);
-
-    return $response;
-
-  }
-
-  /**
    * Refresh the access token.
    */
   public function govready_refresh_token($return = FALSE) {
@@ -106,7 +55,7 @@ class GovreadyPage extends ControllerBase {
       $token = !empty($options['refresh_token']) ? $options['refresh_token'] : '';
     }
 
-    $response = $this->govready_api('/refresh-token', 'POST', array('refresh_token' => $token), TRUE);
+    $response = govready_api('/refresh-token', 'POST', array('refresh_token' => $token), TRUE);
     $response['endoflife'] = time() + (int) $response['expires_in'];
     \Drupal::configFactory()->getEditable('govready.settings')
         ->set('govready_token', $response)
@@ -127,7 +76,7 @@ class GovreadyPage extends ControllerBase {
   public function govready_api_proxy() {
 
     $method = !empty($_REQUEST['method']) ? $_REQUEST['method'] : $_SERVER['REQUEST_METHOD'];
-    $response = $this->govready_api($_REQUEST['endpoint'], $method, $_REQUEST);
+    $response = govready_api($_REQUEST['endpoint'], $method, $_REQUEST);
     return new JsonResponse($response);
 
   }

@@ -29,11 +29,11 @@ class GovreadyAgent {
         // print_r($data);
         if (!empty($data)) {
           if (!empty($_POST['endpoint'])) {
-            // print_r($data);
+             print_r($data);
             $endpoint = '/sites/' . $options['siteId'] . '/' . $_POST['endpoint'];
             $return = \Drupal\govready\Controller\GovreadyPage::govready_api($endpoint, 'POST', $data);
             // drupal_json_output($data);
-            // print_r($return);
+            print_r($return);
           }
           // @TODO return meaningful information
           drupal_json_output(array('response' => 'ok'));
@@ -88,24 +88,24 @@ class GovreadyAgent {
   public function accounts() {
     $out = array();
 
-    $users = entity_load('user');
+    $accounts = user_load_multiple();
 
-    foreach ($users as $key => $user) {
+    foreach ($accounts as $key => $account) {
+      $data = $account->toArray();
       if ($key > 0) {
         array_push($out, array(
-          'userId' => $user->uid,
-          'username' => $user->name,
-          'email' => $user->mail,
-          'name' => $user->name,
-          'created' => $user->created,
-          'roles' => array_values($user->roles),
-          'superAdmin' => user_access('administer site configuration', $user),
-          'lastLogin' => $user->login,
+          'accountId' => $data['uid'][0]['value'],
+          'accountname' => $data['name'][0]['value'],
+          'email' => $data['mail'][0]['value'],
+          'name' => $data['name'][0]['value'],
+          'created' => $data['created'][0]['value'],
+          //'roles' => array_values($account->roles),
+          //'superAdmin' => $account->hasPermission('administer site configuration'),
+          'lastLogin' => $data['login'][0]['value'],
         ));
       }
 
     }
-
     return array('accounts' => $out, 'forceDelete' => TRUE);
 
   }
@@ -121,7 +121,7 @@ class GovreadyAgent {
       'server' => $_SERVER["SERVER_SOFTWARE"],
       'application' => array(
         'platform' => 'Drupal',
-        'version' => VERSION,
+        'version' => \Drupal::VERSION,
       ),
       'database' => function_exists('mysql_get_client_info') ? 'MySQL ' . mysql_get_client_info() : NULL,
     );

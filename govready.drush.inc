@@ -87,7 +87,7 @@ function drush_govready_collect($type = FALSE) {
   }
 
   module_load_include('class.php', 'govready', 'lib/govready-agent');
-  $agent = new GovreadyAgent();
+  $agent = new \Drupal\govready\Controller\GovreadyAgent();
 
   // Split "all" into all of the values (getting rid of all and domains)
   array_shift($correct_args);

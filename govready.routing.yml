@@ -22,4 +22,4 @@ govready_trigger_callback:
   defaults:
     _controller: '\Drupal\govready\Controller\GovreadyPage::govready_trigger_callback'
   requirements:
-    _permission: 'view govready'
+    _permission: 'access content'
