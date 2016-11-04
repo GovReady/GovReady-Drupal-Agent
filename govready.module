@@ -20,7 +20,8 @@ function govready_config() {
       'client_id' => 'HbYZO5QXKfgNshjKlhZGizskiaJH9kGH',
     ),
     'commercial' => FALSE,
-    'govready_url' => 'https://plugin.govready.com/v1.0',
+    'govready_api_url' => 'https://plugin.govready.com/v1.0',
+    'govready_client_url' => 'https://plugin.govready.com',
   );
 
 }
@@ -121,7 +122,7 @@ function govready_validate_token() {
 function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = FALSE) {
 
   $config = govready_config();
-  $url = $config['govready_url'] . $endpoint;
+  $url = $config['govready_api_url'] . $endpoint;
 
   // Make sure our token is a-ok.
   $token = variable_get('govready_token', array());
@@ -148,7 +149,7 @@ function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = 
 
   // Only for debugging.
   if (!empty($config['api_debug']) && $config['api_debug']) {
-    print_r($url);
+    print_r($method .' '. $url);
   }
 
   $response = curl_exec($curl);
@@ -158,6 +159,13 @@ function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = 
   if (!empty($config['api_debug']) && $config['api_debug']) {
     print_r($data);
     print_r($response);
+  }
+
+  // We need to save the siteId in the Drupal govready_options variable if this is a new site.
+  if ($method == 'POST' && $endpoint == '/sites') {
+    $options = variable_get('govready_options', array());
+    $options['siteId'] = $response['_id'];
+    variable_set('govready_options', $options);
   }
 
   $response = json_decode($response, TRUE);
