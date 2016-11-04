@@ -26,7 +26,8 @@ class GovreadyDashboard {
   public function dashboardPage() {
     $options = variable_get('govready_options', array());
 
-    $path = $this->path . '/includes/js/';
+    $path = $this->path . '/includes/js';
+    $client_path = variable_get('govready_client', 'remote') != 'local' ? $this->config['govready_client_url'] : $path . '/client/dist';
     $settings = array(
       'api_endpoint' => url('govready/api'),
       'token_endpoint' => url('govready/refresh-token'),
@@ -47,59 +48,52 @@ class GovreadyDashboard {
 
     // First time using app, need to set everything up.
     if (empty($options['refresh_token'])) {
-
       // Call GovReady /initialize to set the allowed CORS endpoint.
       // @todo: error handling: redirect user to GovReady API dedicated login page
       global $base_url;
       if (empty($options['siteId'])) {
         $data = array(
           'url' => $base_url,
-          'application' => 'drupal',
         );
         $response = govready_api('/initialize', 'POST', $data, TRUE);
-        $options['siteId'] = $response['_id'];
-        variable_set('govready_options', $options);
       }
 
       // Save some JS variables (available at govready.siteId, etc)
-      drupal_add_js($path . 'govready-connect.js');
+      drupal_add_js($path . '/govready-connect.js');
       $settings = array_merge(array(
         // 'nonce' => wp_create_nonce( $this->key ),.
         'auth0' => $this->config['auth0'],
-        'siteId' => $options['siteId'],
+        'siteId' => !empty($options['siteId']) ? $options['siteId'] : NULL,
       ), $settings);
       drupal_add_js(array('govready_connect' => $settings), 'setting');
 
       return theme('govready_connect');
-
     }
 
     // Show me the dashboard!
     else {
 
-      $config = govready_config();
-
       // Save some JS variables (available at govready.siteId, etc)
       $settings = array_merge(array(
-        'siteId' => !is_null($options['siteId']) ? $options['siteId'] : NULL,
+        //'siteId' => !empty($options['siteId']) ? $options['siteId'] : NULL,
         'mode' => !empty($options['mode']) ? $options['mode'] : 'remote',
         // @todo: 'nonce' => wp_create_nonce( $this->key )
-        'connectUrl' => $config['govready_url'],
+        'connectUrl' => $this->config['govready_api_url'],
       ), $settings);
       drupal_add_js(array('govready' => $settings), 'setting');
 
       // Enqueue react.
-      drupal_add_js($path . 'client/dist/vendor.dist.js', array(
+      drupal_add_js($client_path . '/vendor.dist.js', array(
         'scope' => 'footer',
         'group' => 'GovReady',
         'weight' => 1,
       ));
-      drupal_add_js($path . 'client/dist/app.dist.js', array(
+      drupal_add_js($client_path . '/app.dist.js', array(
         'scope' => 'footer',
         'group' => 'GovReady',
         'weight' => 2,
       ));
-      drupal_add_css($path . 'client/dist/app.dist.css');
+      drupal_add_css($client_path . '/app.dist.css', 'external');
 
       return theme('govready_dashboard');
 
