@@ -24,11 +24,17 @@ class GovreadyAgent {
     // print_r($_POST);
     $options = variable_get('govready_options');
     // @todo: check that request is coming from plugin.govready.com, or is properly nonced (for manual refreshes)
-    if ($_POST['siteId'] == $options['siteId']) {
+    if (empty($options['siteId']) || $_POST['siteId'] == $options['siteId']) {
 
       if (!empty($_POST['key'])) {
         $key = $_POST['key'];
         $data = call_user_func(array($this, $key));
+        // Check again, did 
+        $options = variable_get('govready_options');
+        if(empty($options['siteId'])) {
+          print_r('Invalid siteId');
+          return;
+        }
         // print_r($data);
         if (!empty($data)) {
           if (!empty($_POST['endpoint'])) {
@@ -140,6 +146,10 @@ class GovreadyAgent {
 
     $options = variable_get('govready_options', array());
     $options['mode'] = $_POST['mode'];
+    // If we don't have siteId and do have it in post, save
+    if(empty($options['siteId']) && !empty($_POST['siteId'])) {
+      $options['siteId'] = $_POST['siteId'];
+    } 
     variable_set('govready_options', $options);
 
     return array('mode' => $options['mode']);

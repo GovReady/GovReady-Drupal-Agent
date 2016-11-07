@@ -77,10 +77,11 @@ class GovreadyDashboard {
 
       // Save some JS variables (available at govready.siteId, etc)
       $settings = array_merge(array(
-        //'siteId' => !empty($options['siteId']) ? $options['siteId'] : NULL,
-        'mode' => !empty($options['mode']) ? $options['mode'] : 'remote',
-        // @todo: 'nonce' => wp_create_nonce( $this->key )
+        'siteId' => !empty($options['siteId']) ? $options['siteId'] : NULL,
+        'mode' => !empty($options['mode']) ? $options['mode'] : 'preview',
+        'govready_nonce' => drupal_get_token(GOVREADY_KEY),
         'connectUrl' => $this->config['govready_api_url'],
+        'application' => 'drupal',
       ), $settings);
       drupal_add_js(array('govready' => $settings), 'setting');
 
@@ -95,7 +96,12 @@ class GovreadyDashboard {
         'group' => 'GovReady',
         'weight' => 2,
       ));
-      drupal_add_css($client_path . '/app.dist.css', 'external');
+      if(variable_get('govready_client', 'remote') == 'local') {
+        drupal_add_css($client_path . '/app.dist.css');
+      }
+      else {
+        drupal_add_css($client_path . '/app.dist.css', 'external');
+      }
 
       return theme('govready_dashboard');
 
