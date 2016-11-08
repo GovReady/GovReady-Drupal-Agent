@@ -21,15 +21,13 @@ class GovreadyAgent {
    * ?action=govready_v1_trigger&key=stack&endpoint=stack/phpinfo&siteId=xxx.
    */
   public function ping() {
-    // print_r($_POST);
     $options = variable_get('govready_options');
     // @todo: check that request is coming from plugin.govready.com, or is properly nonced (for manual refreshes)
     if (empty($options['siteId']) || $_POST['siteId'] == $options['siteId']) {
-
       if (!empty($_POST['key'])) {
         $key = $_POST['key'];
         $data = call_user_func(array($this, $key));
-        // Check again, did 
+        // Check again, did siteId get set
         $options = variable_get('govready_options');
         if(empty($options['siteId'])) {
           print_r('Invalid siteId');

@@ -160,16 +160,14 @@ function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = 
     print_r($data);
     print_r($response);
   }
-
+  $response = json_decode($response, TRUE);
   // We need to save the siteId in the Drupal govready_options variable if this is a new site.
   if ($method == 'POST' && $endpoint == '/sites') {
     $options = variable_get('govready_options', array());
     $options['siteId'] = $response['_id'];
+
     variable_set('govready_options', $options);
   }
-
-  $response = json_decode($response, TRUE);
-
   return $response;
 
 }
