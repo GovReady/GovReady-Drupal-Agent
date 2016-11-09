@@ -21,6 +21,7 @@ function govready_config() {
     ),
     'commercial' => FALSE,
     'govready_api_url' => 'https://plugin.govready.com/v1.0',
+    'govready_api_ips' => array('104.131.125.39'),
     'govready_client_url' => 'https://plugin.govready.com',
   );
 
@@ -110,7 +111,11 @@ function govready_trigger_callback() {
 }
 
 function govready_validate_token() {
-  if(!isset( $_REQUEST[ "govready_nonce" ] ) || !drupal_valid_token($_REQUEST[ "govready_nonce" ], GOVREADY_KEY)) {
+  $config = govready_config();
+  if(
+    (!isset( $_REQUEST[ "govready_nonce" ] ) || !drupal_valid_token($_REQUEST[ "govready_nonce" ], GOVREADY_KEY)) && 
+    in_array(ip_address(), $config['govready_api_ips'])
+  ) {
     echo "-1";
     drupal_exit();
   }
