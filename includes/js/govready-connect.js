@@ -31,7 +31,7 @@
       settings.govready_connect.token_endpoint, 
       {
         'refresh_token': refresh_token,
-        //@todo: '_ajax_nonce': settings.govready_connect.nonce
+        'govready_nonce': settings.govready_connect.govready_nonce
       }, 
       function(response){
         if (response.id_token != undefined) {

@@ -5,6 +5,8 @@
  * Code for the GovReady module.
  */
 
+define('GOVREADY_KEY', 'govready');
+
 /**
  * GovReady configuration settings.
  */
@@ -12,12 +14,15 @@ function govready_config() {
 
   return array(
     'api_debug' => FALSE,
+    'key' => 'govready',
     'auth0' => array(
       'domain' => 'govready.auth0.com',
       'client_id' => 'HbYZO5QXKfgNshjKlhZGizskiaJH9kGH',
     ),
     'commercial' => FALSE,
-    'govready_url' => 'https://plugin.govready.com/v1.0',
+    'govready_api_url' => 'https://plugin.govready.com/v1.0',
+    'govready_api_ips' => array('104.131.125.39'),
+    'govready_client_url' => 'https://plugin.govready.com',
   );
 
 }
@@ -97,10 +102,23 @@ function govready_dashboard_callback() {
  */
 function govready_trigger_callback() {
 
+  govready_validate_token();
+
   module_load_include('class.php', 'govready', 'lib/govready-agent');
   $agent = new GovreadyAgent();
   return $agent->ping();
 
+}
+
+function govready_validate_token() {
+  $config = govready_config();
+  if(
+    (!isset( $_REQUEST[ "govready_nonce" ] ) || !drupal_valid_token($_REQUEST[ "govready_nonce" ], GOVREADY_KEY)) && 
+    !in_array(ip_address(), $config['govready_api_ips'])
+  ) {
+    echo "-1";
+    drupal_exit();
+  }
 }
 
 /**
@@ -109,7 +127,7 @@ function govready_trigger_callback() {
 function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = FALSE) {
 
   $config = govready_config();
-  $url = $config['govready_url'] . $endpoint;
+  $url = $config['govready_api_url'] . $endpoint;
 
   // Make sure our token is a-ok.
   $token = variable_get('govready_token', array());
@@ -136,7 +154,7 @@ function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = 
 
   // Only for debugging.
   if (!empty($config['api_debug']) && $config['api_debug']) {
-    print_r($url);
+    print_r($method .' '. $url);
   }
 
   $response = curl_exec($curl);
@@ -147,9 +165,14 @@ function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = 
     print_r($data);
     print_r($response);
   }
-
   $response = json_decode($response, TRUE);
+  // We need to save the siteId in the Drupal govready_options variable if this is a new site.
+  if ($method == 'POST' && $endpoint == '/sites') {
+    $options = variable_get('govready_options', array());
+    $options['siteId'] = $response['_id'];
 
+    variable_set('govready_options', $options);
+  }
   return $response;
 
 }
@@ -159,7 +182,8 @@ function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = 
  */
 function govready_refresh_token($return = FALSE) {
 
-  // @todo: nonce this call
+  govready_validate_token();
+
   $options = variable_get('govready_options');
   if (!empty($_REQUEST['refresh_token']) && $_REQUEST['refresh_token']) {
     $token = $_REQUEST['refresh_token'];
@@ -187,6 +211,8 @@ function govready_refresh_token($return = FALSE) {
  * Call the GovReady API.
  */
 function govready_api_proxy() {
+
+  govready_validate_token();
 
   $method = !empty($_REQUEST['method']) ? $_REQUEST['method'] : $_SERVER['REQUEST_METHOD'];
   $response = govready_api($_REQUEST['endpoint'], $method, $_REQUEST);
