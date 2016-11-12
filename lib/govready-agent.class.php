@@ -141,14 +141,22 @@ class GovreadyAgent {
    * Callback for ?action=govready_v1_trigger&key=changeMode.
    */
   private function changeMode() {
-
     $options = variable_get('govready_options', array());
-    $options['mode'] = $_POST['mode'];
-    // If we don't have siteId and do have it in post, save
-    if(empty($options['siteId']) && !empty($_POST['siteId'])) {
-      $options['siteId'] = $_POST['siteId'];
-    } 
-    variable_set('govready_options', $options);
+    // Should we update?
+    $update_mode = !empty($_POST['mode']) &&
+                 ( $_POST['mode'] === 'local'
+                || $_POST['mode'] === 'remote'
+                || $_POST['mode'] === 'preview' );
+    if($update_mode) {
+      $options['mode'] = $_POST['mode'];
+      
+      // If we don't have siteId and do have it in post, save
+      if(empty($options['siteId']) && !empty($_POST['siteId'])) {
+        $options['siteId'] = $_POST['siteId'];
+      }
+
+      variable_set('govready_options', $options);
+    }
 
     return array('mode' => $options['mode']);
 
