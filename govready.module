@@ -114,7 +114,7 @@ function govready_validate_token() {
   $config = govready_config();
   if(
     (!isset( $_REQUEST[ "govready_nonce" ] ) || !drupal_valid_token($_REQUEST[ "govready_nonce" ], GOVREADY_KEY)) && 
-    in_array(ip_address(), $config['govready_api_ips'])
+    !in_array(ip_address(), $config['govready_api_ips'])
   ) {
     echo "-1";
     drupal_exit();
@@ -184,7 +184,6 @@ function govready_refresh_token($return = FALSE) {
 
   govready_validate_token();
 
-  // @todo: nonce this call
   $options = variable_get('govready_options');
   if (!empty($_REQUEST['refresh_token']) && $_REQUEST['refresh_token']) {
     $token = $_REQUEST['refresh_token'];
