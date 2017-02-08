@@ -122,9 +122,24 @@ function govready_validate_token() {
 }
 
 /**
+ * Resets token completely
+ */
+function govready_reset_token() {
+  $options = variable_get('govready_options', array());
+  $options['refresh_token'] = '';
+  variable_set('govready_options', $options);
+  drupal_json_output(array('reset' => true));
+  drupal_exit();
+}
+
+/**
  * Make a request to the GovReady API.
  */
 function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = FALSE) {
+  // Resetting?
+  if(strpos($endpoint, 'reset-token')) {
+    return govready_reset_token();
+  }
 
   $config = govready_config();
   $url = $config['govready_api_url'] . $endpoint;
