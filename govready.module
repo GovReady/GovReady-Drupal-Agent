@@ -23,9 +23,25 @@ function govready_config() {
 }
 
 /**
+ * Resets token completely
+ */
+function govready_reset_token() {
+  $options = \Drupal::config('govready.settings')->get('govready_options');
+  $options['refresh_token'] = '';
+  \Drupal::configFactory()->getEditable('govready.settings')
+    ->set('govready_options', $options)
+    ->save();
+  return array('reset' => true);
+}
+
+/**
  * Make a request to the GovReady API.
  */
 function govready_api($endpoint, $method = 'GET', $data = array(), $anonymous = FALSE) {
+  // Resetting?
+  if(strpos($endpoint, 'reset-token')) {
+    return govready_reset_token();
+  }
 
   $config = govready_config();
   $url = $config['govready_url'] . $endpoint;
