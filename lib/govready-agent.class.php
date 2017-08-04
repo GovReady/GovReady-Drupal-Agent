@@ -39,11 +39,9 @@ class GovreadyAgent {
             // print_r($data);
             $endpoint = '/sites/' . $options['siteId'] . '/' . $_POST['endpoint'];
             $return = govready_api($endpoint, 'POST', $data);
-            // drupal_json_output($data);
-            // print_r($return);
           }
           // @TODO return meaningful information
-          drupal_json_output(array('response' => 'ok'));
+          drupal_json_output(array('response' => 'ok', 'data' => $data, 'return' => $return));
         }
       }
 
