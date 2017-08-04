@@ -107,7 +107,7 @@ function drush_govready_collect($type = FALSE) {
     }
     else {
       $data = call_user_func(array($agent, $item));
-      $endpoint = '/users/' . $options['siteId'] . '/' . $item;
+      $endpoint = '/sites/' . $options['siteId'] . '/' . $item;
     }
     $return = govready_api($endpoint, 'POST', $data);
 
