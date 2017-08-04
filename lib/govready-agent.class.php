@@ -41,7 +41,7 @@ class GovreadyAgent {
             $return = govready_api($endpoint, 'POST', $data);
           }
           // @TODO return meaningful information
-          drupal_json_output(array('response' => 'ok', 'data' => $data, 'return' => $return));
+          drupal_json_output(array('response' => 'ok', 'data' => $data);
         }
       }
 
