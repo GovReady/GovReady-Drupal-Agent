@@ -116,7 +116,7 @@ function govready_validate_token() {
     (!isset( $_REQUEST[ "govready_nonce" ] ) || !drupal_valid_token($_REQUEST[ "govready_nonce" ], GOVREADY_KEY)) && 
     !in_array(ip_address(), $config['govready_api_ips'])
   ) {
-    echo "-1";
+    echo "Access denied: invalid nonce and IP not whitelisted in module: ". ip_address();
     drupal_exit();
   }
 }
